@@ -27,6 +27,6 @@ namespace ProxyLanguage
 
         Stream GetRequestStream();
         IAsyncResult BeginGetResponse(AsyncCallback asyncResult, object args);
-        WebResponse EndGetResponse(IAsyncResult asyncResult);
+        IProxyResponse EndGetResponse(IAsyncResult asyncResult);
     }
 }

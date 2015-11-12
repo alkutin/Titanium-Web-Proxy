@@ -42,7 +42,7 @@ namespace Titanium.Web.Proxy
                 "Titanium Root Certificate Authority");
 
             ListeningIpAddress = IPAddress.Any;
-            ListeningPort = 0;
+            ListeningPort = 15496;
 
             SetupAutofac();
 

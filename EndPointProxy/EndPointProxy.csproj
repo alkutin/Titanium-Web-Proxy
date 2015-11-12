@@ -42,6 +42,8 @@
   <ItemGroup>
     <Compile Include="EndpointProxyStream.cs" />
     <Compile Include="EndPointProxyRequest.cs" />
+    <Compile Include="EndpointProxyResponse.cs" />
+    <Compile Include="EndpointWaitResult.cs" />
     <Compile Include="Extensions\HttpWebRequestExtensions.cs" />
     <Compile Include="Extensions\HttpWebResponseExtensions.cs" />
     <Compile Include="Extensions\StreamExtensions.cs" />

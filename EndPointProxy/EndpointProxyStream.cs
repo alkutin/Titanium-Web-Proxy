@@ -7,20 +7,20 @@ using System.Threading.Tasks;
 
 namespace EndPointProxy
 {
-    public class EndpointProxyStream : Stream
+    public class EndpointProxyStream : Stream, IDisposable
     {
-        private Stream _requestStream;
+        private Stream _innerStream;
 
-        public EndpointProxyStream(Stream requestStream)
+        public EndpointProxyStream(Stream innerStream)
         {
-            _requestStream = requestStream;
+            _innerStream = innerStream;
         }
 
         public override bool CanRead
         {
             get
             {
-                return _requestStream.CanRead;
+                return _innerStream.CanRead;
             }
         }
 
@@ -28,7 +28,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _requestStream.CanSeek;
+                return _innerStream.CanSeek;
             }
         }
 
@@ -36,7 +36,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _requestStream.CanWrite;
+                return _innerStream.CanWrite;
             }
         }
 
@@ -44,7 +44,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _requestStream.Length;
+                return _innerStream.Length;
             }
         }
 
@@ -52,38 +52,49 @@ namespace EndPointProxy
         {
             get
             {
-                return _requestStream.Position;
+                return _innerStream.Position;
             }
 
             set
             {
-                _requestStream.Position = value;
+                _innerStream.Position = value;
             }
         }
 
         public override void Flush()
         {
-            _requestStream.Flush();
+            if (_innerStream != null)
+                _innerStream.Flush();
         }
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _requestStream.Read(buffer, offset, count);
+            return _innerStream.Read(buffer, offset, count);
         }
 
         public override long Seek(long offset, SeekOrigin origin)
         {
-            return _requestStream.Seek(offset, origin);
+            return _innerStream.Seek(offset, origin);
         }
 
         public override void SetLength(long value)
         {
-            _requestStream.SetLength(value);
+            _innerStream.SetLength(value);
         }
 
         public override void Write(byte[] buffer, int offset, int count)
         {
-            _requestStream.Write(buffer, offset, count);
+            _innerStream.Write(buffer, offset, count);
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && _innerStream != null)
+            {
+                _innerStream.Dispose();                
+            }
+                
+            base.Dispose(disposing);
         }
     }
 }

@@ -3,6 +3,7 @@ using ProxyLanguage;
 using ProxyLanguage.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -146,12 +147,23 @@ namespace EndPointProxy
 
         public IAsyncResult BeginGetResponse(AsyncCallback asyncResult, object args)
         {
-            return _proxyRequest.BeginGetResponse(asyncResult, args);
+            return new EndpointWaitResult(_proxyRequest).BeginGetResponse(asyncResult, args);
+
+            //return _proxyRequest.BeginGetResponse(asyncResult, args);
         }
 
-        public WebResponse EndGetResponse(IAsyncResult asyncResult)
+        public IProxyResponse EndGetResponse(IAsyncResult asyncResult)
         {
-            return _proxyRequest.EndGetResponse(asyncResult);
+            //return _proxyRequest.EndGetResponse(asyncResult);
+            try
+            {
+                return new EndpointProxyResponse((HttpWebResponse)EndpointWaitResult.EndGetResponse(asyncResult));
+            }
+            catch (WebException webEx)
+            {
+                Debug.WriteLine(webEx.ToString());
+                return new EndpointProxyResponse(webEx.Response as HttpWebResponse);
+            }            
         }   
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Text;
 
@@ -24,17 +25,23 @@ namespace Titanium.Web.Proxy.Helpers
                 {
                     if (lastChar == '\r' && buf[0] == '\n')
                     {
-                        return readBuffer.Remove(readBuffer.Length - 1, 1).ToString();
+                        var rnRez = readBuffer.Remove(readBuffer.Length - 1, 1).ToString();
+                        Debug.WriteLine("Read: " + rnRez);
+                        return rnRez;
                     }
                     if (buf[0] == '\0')
                     {
-                        return readBuffer.ToString();
+                        var zRez = readBuffer.ToString();
+                        Debug.WriteLine("Read: " + zRez);
+                        return zRez;
                     }
                     readBuffer.Append(buf[0]);
 
                     lastChar = buf[0];
                 }
-                return readBuffer.ToString();
+                var rez = readBuffer.ToString();
+                Debug.WriteLine("Read: " + rez);
+                return rez;
             }
             catch (IOException)
             {

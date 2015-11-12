@@ -53,7 +53,9 @@ namespace Titanium.Web.Proxy.EventArguments
         internal bool ResponseBodyRead { get; set; }
         public List<HttpHeader> ResponseHeaders { get; internal set; }
         internal bool ResponseLocked { get; set; }
-        internal HttpWebResponse ServerResponse { get; set; }
+        internal IProxyResponse ServerResponse { get; set; }
+
+        internal IAsyncResult RequestAsyncResult { get; set; }
 
         public int RequestContentLength
         {

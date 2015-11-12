@@ -3,6 +3,7 @@ using ProxyLanguage;
 using ProxyLanguage.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -22,7 +23,7 @@ namespace Titanium.Web.Proxy
     {
         private static void HandleClient(TcpClient client)
         {
-            Stream clientStream = client.GetStream();
+            Stream clientStream = new EndpointProxyStream(client.GetStream());
             var clientStreamReader = new CustomBinaryReader(clientStream, Encoding.ASCII);
             var clientStreamWriter = new StreamWriter(clientStream);
 
@@ -103,8 +104,9 @@ namespace Titanium.Web.Proxy
                         HandleHttpSessionRequest(client, httpCmd, clientStream, clientStreamReader, clientStreamWriter,
                             httpRemoteUri.Scheme == Uri.UriSchemeHttps ? httpRemoteUri.OriginalString : null));
             }
-            catch
+            catch(Exception error)
             {
+                Debug.WriteLine(error.ToString());
                 Dispose(client, clientStream, clientStreamReader, clientStreamWriter, null);
             }
         }
@@ -212,7 +214,7 @@ namespace Titanium.Web.Proxy
                     var newStream = args.ProxyRequest.GetRequestStream();
                     newStream.Write(args.RequestBody, 0, args.RequestBody.Length);
 
-                    args.ProxyRequest.BeginGetResponse(HandleHttpSessionResponse, args);
+                    args.RequestAsyncResult = args.ProxyRequest.BeginGetResponse(HandleHttpSessionResponse, args);
                 }
                 else
                 {
@@ -222,20 +224,21 @@ namespace Titanium.Web.Proxy
                         SendClientRequestBody(args);
                     }
                     //Http request body sent, now wait asynchronously for response
-                    args.ProxyRequest.BeginGetResponse(HandleHttpSessionResponse, args);
+                    args.RequestAsyncResult = args.ProxyRequest.BeginGetResponse(HandleHttpSessionResponse, args);
                 }
 
                 //Now read the next request (if keep-Alive is enabled, otherwise exit this thread)
                 //If client is pipeling the request, this will be immediately hit before response for previous request was made
-                httpCmd = clientStreamReader.ReadLine();
+                httpCmd = clientStreamReader.ReadLine();                
                 //Http request body sent, now wait for next request
                 Task.Factory.StartNew(
                     () =>
                         HandleHttpSessionRequest(args.Client, httpCmd, args.ClientStream, args.ClientStreamReader,
                             args.ClientStreamWriter, secureTunnelHostName));
             }
-            catch
+            catch (Exception error)
             {
+                Debug.WriteLine(error.ToString());
                 Dispose(client, clientStream, clientStreamReader, clientStreamWriter, args);
             }
         }
@@ -329,8 +332,9 @@ namespace Titanium.Web.Proxy
 
                     postStream.Close();
                 }
-                catch
+                catch (Exception error)
                 {
+                    Debug.WriteLine(error.ToString());
                     postStream.Close();
                     postStream.Dispose();
 

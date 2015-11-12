@@ -41,6 +41,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="IProxyRequest.cs" />
+    <Compile Include="IProxyResponse.cs" />
     <Compile Include="Models\HttpHeader.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

@@ -1,7 +1,9 @@
 ﻿using EndPointProxy.Extensions;
+using ProxyLanguage;
 using ProxyLanguage.Models;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -19,16 +21,8 @@ namespace Titanium.Web.Proxy
         {
             var args = (SessionEventArgs)asynchronousResult.AsyncState;
 
-            try
-            {
-                args.ServerResponse = (HttpWebResponse)args.ProxyRequest.EndGetResponse(asynchronousResult);
-            }
-            catch (WebException webEx)
-            {
-                //Things line 404, 500 etc
-                args.ServerResponse = webEx.Response as HttpWebResponse;
-            }
-
+            args.ServerResponse = args.ProxyRequest.EndGetResponse(asynchronousResult);
+            
             try
             {
                 if (args.ServerResponse != null)
@@ -82,8 +76,10 @@ namespace Titanium.Web.Proxy
                     args.ClientStream.Flush();
                 }
             }
-            catch
+            catch(Exception error)
             {
+                Debug.WriteLine(error.ToString());
+
                 Dispose(args.Client, args.ClientStream, args.ClientStreamReader, args.ClientStreamWriter, args);
             }
             finally
@@ -92,7 +88,7 @@ namespace Titanium.Web.Proxy
             }
         }
 
-        private static List<HttpHeader> ReadResponseHeaders(HttpWebResponse response)
+        private static List<HttpHeader> ReadResponseHeaders(IProxyResponse response)
         {
             var returnHeaders = new List<HttpHeader>();
 
@@ -185,10 +181,15 @@ namespace Titanium.Web.Proxy
                 var buffer = new byte[BUFFER_SIZE];
 
                 int bytesRead;
-                while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                using (var memoryStream = new MemoryStream())
                 {
-                    outStream.Write(buffer, 0, bytesRead);
-                }
+                    while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        memoryStream.Write(buffer, 0, bytesRead);
+                    }
+
+                    outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
+                }                
             }
             else
                 WriteResponseBodyChunked(inStream, outStream);
