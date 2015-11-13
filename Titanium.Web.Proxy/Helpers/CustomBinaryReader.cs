@@ -45,7 +45,9 @@ namespace Titanium.Web.Proxy.Helpers
             }
             catch (IOException)
             {
-                return readBuffer.ToString();
+                var eRez = readBuffer.ToString();
+                Debug.WriteLine("Read: " + eRez);
+                return eRez;
             }
         }
 

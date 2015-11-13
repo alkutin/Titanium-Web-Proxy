@@ -13,6 +13,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Helpers;
@@ -21,6 +22,27 @@ namespace Titanium.Web.Proxy
 {
     partial class ProxyServer
     {
+        private static AutoResetEvent _syncEvent = new AutoResetEvent(true);
+        private static System.Collections.Concurrent.ConcurrentQueue<TcpClient> _clientsToProcess = new System.Collections.Concurrent.ConcurrentQueue<TcpClient>();
+
+        private static void ProcessQueue(TcpClient client)
+        {
+            _clientsToProcess.Enqueue(client);
+            _syncEvent.WaitOne();            
+            try
+            {
+                TcpClient qClient;
+                while (_clientsToProcess.TryDequeue(out qClient))
+                {
+                    HandleClient(qClient);
+                }
+            }
+            finally
+            {
+                _syncEvent.Set();
+            }
+        }
+
         private static void HandleClient(TcpClient client)
         {
             Stream clientStream = new EndpointProxyStream(client.GetStream());

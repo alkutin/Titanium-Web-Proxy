@@ -69,7 +69,7 @@ namespace Titanium.Web.Proxy
 
                         WriteResponseStatus(args.ServerResponse.ProtocolVersion, args.ServerResponse.StatusCode,
                             args.ServerResponse.StatusDescription, args.ClientStreamWriter);
-                        WriteResponseHeaders(args.ClientStreamWriter, args.ResponseHeaders);
+                        WriteResponseHeaders(args.ClientStreamWriter, args.ResponseHeaders, true);// isChunked || !string.IsNullOrEmpty(args.ServerResponse.GetResponseHeader("content-length")));
                         WriteResponseBody(args.ResponseStream, args.ClientStream, isChunked);
                     }
 
@@ -124,7 +124,7 @@ namespace Titanium.Web.Proxy
             responseWriter.WriteLine(s);
         }
 
-        private static void WriteResponseHeaders(StreamWriter responseWriter, List<HttpHeader> headers)
+        private static void WriteResponseHeaders(StreamWriter responseWriter, List<HttpHeader> headers, bool flush)
         {
             if (headers != null)
             {
@@ -135,7 +135,8 @@ namespace Titanium.Web.Proxy
             }
 
             responseWriter.WriteLine();
-            responseWriter.Flush();
+            if (flush)
+                responseWriter.Flush();
         }
 
         private static void WriteResponseHeaders(StreamWriter responseWriter, List<HttpHeader> headers, int length,
@@ -188,6 +189,7 @@ namespace Titanium.Web.Proxy
                         memoryStream.Write(buffer, 0, bytesRead);
                     }
 
+                    Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
                     outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
                 }                
             }

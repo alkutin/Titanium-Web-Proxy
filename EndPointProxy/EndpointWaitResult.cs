@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -66,8 +67,19 @@ namespace EndPointProxy
             //task.Start();
             new Task((state) => {
                 InnerResult.AsyncWaitHandle.WaitOne();
-                _webResponse = _proxyRequest.EndGetResponse(InnerResult);
-                _waitEvent.Set();
+                try
+                {
+                    _webResponse = _proxyRequest.EndGetResponse(InnerResult);
+                }
+                catch (WebException webEx)
+                {
+                    Debug.WriteLine(webEx.ToString());
+                    _webResponse = webEx.Response as HttpWebResponse;
+                }
+                finally
+                {
+                    _waitEvent.Set();
+                }
             }, this).Start();
 
             return this;

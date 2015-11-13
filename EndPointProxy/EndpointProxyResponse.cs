@@ -76,10 +76,12 @@ namespace EndPointProxy
 
         public string GetResponseHeader(string name)
         {
-            string rez;
-            if (Headers.TryGetValue(name, out rez))
-                return rez;
-
+            foreach (var header in Headers)
+            {
+                if (header.Key.Equals(name, StringComparison.InvariantCultureIgnoreCase))
+                    return header.Value;
+            }
+            
             return string.Empty;
         }
 

@@ -1,6 +1,7 @@
 ﻿using Autofac;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using System.Net.Security;
 using System.Net.Sockets;
@@ -133,18 +134,21 @@ namespace Titanium.Web.Proxy
 
         private static void OnAcceptConnection(IAsyncResult asyn)
         {
+            TcpClient client = null;
             try
             {
                 // Get the listener that handles the client request.
                 _listener.BeginAcceptTcpClient(OnAcceptConnection, _listener);
 
-                var client = _listener.EndAcceptTcpClient(asyn);
+                client = _listener.EndAcceptTcpClient(asyn);
                 Task.Factory.StartNew(() => HandleClient(client));
             }
-            catch
+            catch(Exception error)
             {
-                // ignored
-            }
+                Debug.WriteLine(error.ToString());
+                if (client != null)
+                    client.Close();
+            }            
         }
 
 
