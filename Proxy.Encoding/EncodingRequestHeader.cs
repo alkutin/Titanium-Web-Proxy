@@ -13,6 +13,5 @@ namespace Proxy.Encoding
         public string HttpMethod;
         public Uri RequestUri;
         public List<HttpHeader> RequestHeaders;
-        public byte[] RequestBody;
     }
 }

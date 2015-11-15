@@ -54,6 +54,10 @@
     <Compile Include="ResponseEncoder.cs" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\EndPointProxy\EndPointProxy.csproj">
+      <Project>{d91ce2a9-7664-4286-a7c7-9b9f487d24ac}</Project>
+      <Name>EndPointProxy</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProxyLanguage\ProxyLanguage.csproj">
       <Project>{5eeb4789-0f7f-494f-ad19-d2a9390767c2}</Project>
       <Name>ProxyLanguage</Name>
