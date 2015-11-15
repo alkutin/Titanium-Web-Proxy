@@ -1,8 +1,6 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
-MinimumVisualStudioVersion = 10.0.40219.1
+# Visual Studio 2012
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B6DBABDC-C985-4872-9C38-B4E5079CBC4B}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Titanium.Web.Proxy.Test", "Titanium.Web.Proxy.Test\Titanium.Web.Proxy.Test.csproj", "{F3B7E553-1904-4E80-BDC7-212342B5C952}"
@@ -19,6 +17,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ProxyLanguage", "ProxyLanguage\ProxyLanguage.csproj", "{5EEB4789-0F7F-494F-AD19-D2A9390767C2}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EndPointProxy", "EndPointProxy\EndPointProxy.csproj", "{D91CE2A9-7664-4286-A7C7-9B9F487D24AC}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proxy.Encoding", "Proxy.Encoding\Proxy.Encoding.csproj", "{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Tests.ProxyServices", "Tests.ProxyServices\Tests.ProxyServices.csproj", "{4B842090-7726-463A-9A11-1734CA845413}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -74,12 +76,29 @@ Global
 		{D91CE2A9-7664-4286-A7C7-9B9F487D24AC}.Release|x64.Build.0 = Release|Any CPU
 		{D91CE2A9-7664-4286-A7C7-9B9F487D24AC}.Release|x86.ActiveCfg = Release|Any CPU
 		{D91CE2A9-7664-4286-A7C7-9B9F487D24AC}.Release|x86.Build.0 = Release|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Release|Any CPU.Build.0 = Release|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Release|x64.ActiveCfg = Release|Any CPU
+		{94AF08D8-960E-4B4C-AD38-87E7ED0B6241}.Release|x86.ActiveCfg = Release|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Release|x64.ActiveCfg = Release|Any CPU
+		{4B842090-7726-463A-9A11-1734CA845413}.Release|x86.ActiveCfg = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
 		{F3B7E553-1904-4E80-BDC7-212342B5C952} = {B6DBABDC-C985-4872-9C38-B4E5079CBC4B}
+		{4B842090-7726-463A-9A11-1734CA845413} = {B6DBABDC-C985-4872-9C38-B4E5079CBC4B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		EnterpriseLibraryConfigurationToolBinariesPath = .1.505.2\lib\NET35

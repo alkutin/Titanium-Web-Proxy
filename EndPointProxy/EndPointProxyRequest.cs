@@ -37,7 +37,13 @@ namespace EndPointProxy
 
         public Uri RequestUri { get; private set; }
         public bool KeepAlive {get { return _proxyRequest.KeepAlive; } }
-        public Encoding RequestEncoding { get { return _proxyRequest.GetEncoding(); } }
+        
+        public Encoding RequestEncoding { 
+            get 
+            { 
+                return _proxyRequest.GetEncoding(); 
+            } 
+        }
 
         public string Method { get { return _proxyRequest.Method; } }
 
