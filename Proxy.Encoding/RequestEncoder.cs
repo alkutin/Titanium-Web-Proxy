@@ -23,14 +23,12 @@ namespace Proxy.Encoding
         private TimeSpan WaitTimeoutMSecs = TimeSpan.FromMinutes(10);
         private IEncodedAsyncResult _asyncResult;
 
-        public RequestEncoder(IEncodedTransfer encodedTransfer, Uri requestUri, string httpMethod, Version version,
-            IEnumerable<HttpHeader> requestHeaders)
+        public RequestEncoder(IEncodedTransfer encodedTransfer, Uri requestUri, string httpMethod, Version version)
         {
             _encodedTransfer = encodedTransfer;
             _requestUri = requestUri;
             _httpMethod = httpMethod;
-            _version = version;
-            _requestHeaders = requestHeaders.ToList();
+            _version = version;            
         }
 
         public Uri RequestUri

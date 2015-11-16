@@ -43,6 +43,7 @@
   <ItemGroup>
     <Compile Include="EncodedProxyResponse.cs" />
     <Compile Include="Encoder.cs" />
+    <Compile Include="EncodingAsyncResult.cs" />
     <Compile Include="EncodingRequestBody.cs" />
     <Compile Include="EncodingRequestHeader.cs" />
     <Compile Include="EncodingResponseBody.cs" />

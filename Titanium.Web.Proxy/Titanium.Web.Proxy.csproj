@@ -123,6 +123,10 @@
       <Project>{d91ce2a9-7664-4286-a7c7-9b9f487d24ac}</Project>
       <Name>EndPointProxy</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Proxy.Encoding\Proxy.Encoding.csproj">
+      <Project>{94af08d8-960e-4b4c-ad38-87e7ed0b6241}</Project>
+      <Name>Proxy.Encoding</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProxyLanguage\ProxyLanguage.csproj">
       <Project>{5eeb4789-0f7f-494f-ad19-d2a9390767c2}</Project>
       <Name>ProxyLanguage</Name>

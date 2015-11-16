@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using EndPointProxy;
 using ProxyLanguage;
+using ProxyLanguage.Models;
 
 namespace Proxy.Encoding
 {
@@ -15,6 +16,10 @@ namespace Proxy.Encoding
         private EncodingRequestHeader _requestHeaders;
         private EncodingRequestBody _requestBody;
         private Task _requestBodyTask;
+        private IAsyncResult _headersResponseAsync;
+        private IProxyResponse _proxyResponse;
+        private EncodingAsyncResult _encodingAsyncResult;
+
         public ResponseEncoder()
         {            
         }
@@ -26,28 +31,75 @@ namespace Proxy.Encoding
             _proxyRequest = new EndPointProxyRequest(_requestHeaders.RequestUri, _requestHeaders.HttpMethod, _requestHeaders.Version);
             _proxyRequest.SetRequestHeaders(_requestHeaders.RequestHeaders);
 
-            if (_requestBody.Body != null && _requestBody.Body.Length > 0)
+            _encodingAsyncResult = new EncodingAsyncResult()
             {
-                _requestBodyTask = new MemoryStream(_requestBody.Body).CopyToAsync(_proxyRequest.GetRequestStream());
-            }
+                Key = Guid.NewGuid(),
+                RequestHeaders = _requestHeaders
+            };
 
-            //return new 
-            throw new NotImplementedException();
+
+            if (_requestBody.Body != null && _requestBody.Body.Length > 0)
+                _requestBodyTask = new MemoryStream(_requestBody.Body).CopyToAsync(_proxyRequest.GetRequestStream());
+            else
+                _requestBodyTask = Task.Delay(0);
+
+            _requestBodyTask.ContinueWith((task) => {
+                _headersResponseAsync = _proxyRequest.BeginGetResponse((response) =>
+                {
+                    _proxyResponse = _proxyRequest.EndGetResponse(_headersResponseAsync);
+
+                    long contentLength;
+                    if (!long.TryParse(_proxyResponse.GetResponseHeader("Content-Length"), out contentLength))
+                        contentLength = 0;
+
+                    _encodingAsyncResult.ResponseHeaders = new EncodingResponseHeader
+                    {
+                        HttpCode = _proxyResponse.StatusCode,
+                        HttpDescription = _proxyResponse.StatusDescription,
+                        ContentEncoding = _proxyResponse.ContentEncoding,
+                        HasBody = contentLength != 0 || _proxyResponse.StatusCode != System.Net.HttpStatusCode.Created,
+                        ResponseHeaders = _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList()
+                    };
+
+                    var memStream = new MemoryStream();
+                    _proxyResponse.GetResponseStream().CopyToAsync(memStream).ContinueWith(w => {
+                        _encodingAsyncResult.ResponseBody = new EncodingResponseBody { Body = memStream.ToArray() };                        
+                    });                                                                                                                      
+                }, this);
+            });
+            
+
+            
+            return _encodingAsyncResult;
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
         {
-            throw new NotImplementedException();
+            _requestBodyTask.Wait();
+            _encodingAsyncResult.WaitForHeader();
+                                        
+            if (onReceivedResponse != null)
+            {
+                onReceivedResponse(requestAsyncResult.ResponseHeaders);
+            }
         }
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            throw new NotImplementedException();
+            _encodingAsyncResult.WaitForBody();
+
+            if (onReceiveBody != null)
+            {
+                onReceiveBody(requestAsyncResult.ResponseBody);
+            }
         }
 
         public void Abort(IEncodedAsyncResult requestAsyncResult)
         {
-            throw new NotImplementedException();
+            if (_requestBodyTask != null)
+                _requestBodyTask.Dispose();
+            if (_proxyResponse != null)
+                _proxyResponse.Close();
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using EndPointProxy;
+using Proxy.Encoding;
 using ProxyLanguage;
 using ProxyLanguage.Models;
 using System;
@@ -199,7 +200,10 @@ namespace Titanium.Web.Proxy
 
 
                 //construct the web request that we are going to issue on behalf of the client.
-                args.ProxyRequest = new EndPointProxyRequest(httpRemoteUri, httpMethod, version);// (HttpWebRequest) WebRequest.Create(httpRemoteUri);                
+                args.ProxyRequest = new RequestEncoder(new ResponseEncoder(), httpRemoteUri, httpMethod, version);
+                //new EndPointProxyRequest(httpRemoteUri, httpMethod, version);// (HttpWebRequest) WebRequest.Create(httpRemoteUri); 
+                SetRequestHeaders(args.RequestHeaders, args.ProxyRequest);
+
                 args.ClientStream = clientStream;
                 args.ClientStreamReader = clientStreamReader;
                 args.ClientStreamWriter = clientStreamWriter;
@@ -226,9 +230,7 @@ namespace Titanium.Web.Proxy
                     Dispose(client, clientStream, clientStreamReader, clientStreamWriter, args);
                     return;
                 }
-
-                SetRequestHeaders(args.RequestHeaders, args.ProxyRequest);
-
+                
                 //If request was modified by user
                 if (args.RequestBodyRead)
                 {
