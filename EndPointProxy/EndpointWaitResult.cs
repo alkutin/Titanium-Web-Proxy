@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace EndPointProxy
 {
-    public class EndpointWaitResult : IAsyncResult
+    public class EndpointWaitResult : IAsyncResult, IDisposable
     {
         private HttpWebRequest _proxyRequest;
         private object _args;
@@ -96,5 +96,37 @@ namespace EndPointProxy
         {
             _asyncResultHandler(this);
         }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                _waitEvent.Dispose();
+
+                disposedValue = true;
+            }
+        }
+
+        
+        ~EndpointWaitResult() {
+           // Do not change this code. Put cleanup code in Dispose(bool disposing) above.
+           Dispose(false);
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {            
+            Dispose(true);            
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

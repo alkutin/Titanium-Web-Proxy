@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Proxy.Encoding
 {
-    public class EncodingAsyncResult : IEncodedAsyncResult, IAsyncResult
+    public class EncodingAsyncResult : IEncodedAsyncResult, IAsyncResult, IDisposable
     {
         ManualResetEvent _headerReceived = new ManualResetEvent(false);
         ManualResetEvent _bodyReceived = new ManualResetEvent(false);
@@ -16,10 +16,7 @@ namespace Proxy.Encoding
 
         public object AsyncState
         {
-            get
-            {
-                return null;
-            }
+            get; set;
         }
 
         public WaitHandle AsyncWaitHandle
@@ -96,5 +93,41 @@ namespace Proxy.Encoding
         {
             _headerReceived.WaitOne();
         }
+
+        public void SetAsyncState(object asyncState)
+        {
+            AsyncState = asyncState;
+        }
+
+        #region IDisposable Support
+        private bool disposedValue = false; // To detect redundant calls
+
+        protected virtual void Dispose(bool disposing)
+        {
+            if (!disposedValue)
+            {
+                if (disposing)
+                {
+                    // TODO: dispose managed state (managed objects).
+                }
+
+                _headerReceived.Dispose();
+                _bodyReceived.Dispose();
+
+                disposedValue = true;
+            }
+        }
+        
+        ~EncodingAsyncResult() {
+           Dispose(false);
+        }
+
+        // This code added to correctly implement the disposable pattern.
+        public void Dispose()
+        {            
+            Dispose(true);         
+            GC.SuppressFinalize(this);
+        }
+        #endregion
     }
 }

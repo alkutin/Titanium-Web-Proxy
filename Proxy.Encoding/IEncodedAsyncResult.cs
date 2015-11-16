@@ -13,6 +13,7 @@ namespace Proxy.Encoding
         EncodingResponseHeader ResponseHeaders { get; set; }
         EncodingResponseBody ResponseBody { get; set; }
 
+        void SetAsyncState(object asyncState);
         void WaitForHeader();
         void WaitForBody();
     }

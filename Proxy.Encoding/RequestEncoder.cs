@@ -140,8 +140,14 @@ namespace Proxy.Encoding
                                 });
                             }
                         });
+
+                    if (asyncResult != null)
+                    {
+                        asyncResult(_asyncResult);
+                    }
                 });
 
+            _asyncResult.SetAsyncState(args);
             return _asyncResult;
         }
 

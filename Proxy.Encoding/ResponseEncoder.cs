@@ -46,6 +46,9 @@ namespace Proxy.Encoding
             _requestBodyTask.ContinueWith((task) => {
                 _headersResponseAsync = _proxyRequest.BeginGetResponse((response) =>
                 {
+                    if (onComplete != null)
+                        Task.Run(() => { onComplete(_encodingAsyncResult); });
+
                     _proxyResponse = _proxyRequest.EndGetResponse(_headersResponseAsync);
 
                     long contentLength;
@@ -75,7 +78,7 @@ namespace Proxy.Encoding
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
         {
-            _requestBodyTask.Wait();
+            //_requestBodyTask.Wait();
             _encodingAsyncResult.WaitForHeader();
                                         
             if (onReceivedResponse != null)
