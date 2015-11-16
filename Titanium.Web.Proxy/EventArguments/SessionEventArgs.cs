@@ -101,6 +101,11 @@ namespace Titanium.Web.Proxy.EventArguments
 
             if (ServerResponse != null)
                 ServerResponse.Close();
+
+            if (RequestAsyncResult != null && RequestAsyncResult is IDisposable)
+            {
+                ((IDisposable)RequestAsyncResult).Dispose();
+            }
         }
 
         private void ReadRequestBody()
