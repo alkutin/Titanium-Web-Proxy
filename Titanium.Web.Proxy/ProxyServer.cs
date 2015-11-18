@@ -11,6 +11,7 @@ using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Helpers;
+using System.Configuration;
 
 namespace Titanium.Web.Proxy
 {
@@ -43,7 +44,7 @@ namespace Titanium.Web.Proxy
                 "Titanium Root Certificate Authority");
 
             ListeningIpAddress = IPAddress.Any;
-            ListeningPort = 15496;
+            ListeningPort = int.Parse(ConfigurationManager.AppSettings["ListeningPort"]);
 
             SetupAutofac();
 

@@ -108,7 +108,8 @@ namespace Proxy.Encoding
 
         public void Abort()
         {
-            _encodedTransfer.Abort(_asyncResult);
+            if (_asyncResult != null)
+                _encodedTransfer.Abort(_asyncResult);
         }
 
         public System.IO.Stream GetRequestStream()

@@ -31,21 +31,43 @@ namespace Proxy.Encoding
             request.GetResponseAsync();
             EncodingAsyncResult removedItem;
             if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))
-            {
-                removedItem.Dispose();
-            }
+                removedItem.Dispose();            
         }
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            throw new NotImplementedException();
+            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "body=true");
+            var responseTask = httpRequest.GetResponseAsync();
+            responseTask.ContinueWith(task =>
+            {
+                var memoryStream = new MemoryStream();
+                task.Result.GetResponseStream().CopyTo(memoryStream);
+                var data = _encoder.Decode<EncodingResponseBody>(memoryStream.ToArray());
+                if (onReceiveBody != null)
+                {
+                    onReceiveBody(data);
+                }
+
+                EncodingAsyncResult removedItem;
+                if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))                
+                    removedItem.Dispose();
+            });
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
         {
             var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "body=false");
-            //var response = await httpRequest.GetResponseAsync();
-            throw new NotImplementedException();
+            var responseTask = httpRequest.GetResponseAsync();
+            responseTask.ContinueWith(task =>
+            {
+                var memoryStream = new MemoryStream();
+                task.Result.GetResponseStream().CopyTo(memoryStream);
+                var data = _encoder.Decode<EncodingResponseHeader>(memoryStream.ToArray());
+                if (onReceivedResponse != null)
+                {
+                    onReceivedResponse(data);
+                }
+            });
         }
 
         public IEncodedAsyncResult SendRequestAsync(KeyValuePair<EncodingRequestHeader, EncodingRequestBody> request, Action<IEncodedAsyncResult> onComplete)
