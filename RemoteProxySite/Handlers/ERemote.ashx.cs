@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -29,17 +30,29 @@ namespace RemoteProxySite.Handlers
         {
             try
             {
+                context.Response.StatusCode = 200;
                 context.Response.ContentType = "application/content-stream";
+                context.Response.BufferOutput = true;
 
                 if (context.Request.HttpMethod == "GET")
                 {
+                    var key = Guid.Parse(context.Request.Params["key"]);
+                    var body = bool.Parse(context.Request.Params["Body"]);
+                    var buffer = Get(key, body);
                     
-                } else if (context.Request.HttpMethod == "POST")
+                    context.Response.BinaryWrite(buffer);
+                } 
+                else if (context.Request.HttpMethod == "POST")
                 {
-                    
-                } else if (context.Request.HttpMethod == "DELETE")
+                    var stream = new MemoryStream();
+                    context.Request.GetBufferedInputStream().CopyTo(stream);
+                    context.Response.BinaryWrite(Post(stream.ToArray()));
+                } 
+                else if (context.Request.HttpMethod == "DELETE")
                 {
-                    
+                    var key = Guid.Parse(context.Request.Params["key"]);
+                    Delete(key);
+                    context.Response.Write("Deleted");
                 }
 
                 context.Response.Write("Hello World");
@@ -47,6 +60,7 @@ namespace RemoteProxySite.Handlers
             }
             catch (Exception errorException)
             {
+                context.Response.StatusCode = 500;
                 context.Response.ContentType = "application/text-plain";
                 context.Response.Write(errorException.ToString());
             }

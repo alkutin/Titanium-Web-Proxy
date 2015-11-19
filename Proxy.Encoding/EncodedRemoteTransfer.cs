@@ -36,7 +36,7 @@ namespace Proxy.Encoding
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "body=true");
+            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "Body=true");
             var responseTask = httpRequest.GetResponseAsync();
             responseTask.ContinueWith(task =>
             {

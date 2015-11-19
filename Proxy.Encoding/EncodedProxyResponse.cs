@@ -19,7 +19,7 @@ namespace Proxy.Encoding
 
         public Version ProtocolVersion
         {
-            get { return _asyncResult.RequestHeaders.Version; }
+            get { return Version.Parse(_asyncResult.RequestHeaders.Version); }
         }
 
         public System.Net.HttpStatusCode StatusCode

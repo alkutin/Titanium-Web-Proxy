@@ -28,7 +28,7 @@ namespace Proxy.Encoding
         {
             _requestHeaders = request.Key;
             _requestBody = request.Value;
-            _proxyRequest = new EndPointProxyRequest(_requestHeaders.RequestUri, _requestHeaders.HttpMethod, _requestHeaders.Version);
+            _proxyRequest = new EndPointProxyRequest(_requestHeaders.RequestUri, _requestHeaders.HttpMethod, Version.Parse(_requestHeaders.Version));
             _proxyRequest.SetRequestHeaders(_requestHeaders.RequestHeaders);
 
             _encodingAsyncResult = new EncodingAsyncResult()

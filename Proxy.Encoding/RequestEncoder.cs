@@ -123,7 +123,7 @@ namespace Proxy.Encoding
             { 
                 HttpMethod = _httpMethod,
                 RequestUri = _requestUri,
-                Version = _version,
+                Version = _version.ToString(),
                 RequestHeaders = _requestHeaders
             };
             

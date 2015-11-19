@@ -9,7 +9,7 @@ namespace Proxy.Encoding
     [Serializable]
     public class EncodingRequestHeader
     {
-        public Version Version;
+        public string Version;
         public string HttpMethod;
         public Uri RequestUri;
         public List<HttpHeader> RequestHeaders;

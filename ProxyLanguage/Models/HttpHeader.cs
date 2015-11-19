@@ -4,6 +4,11 @@ namespace ProxyLanguage.Models
 {
     public class HttpHeader
     {
+        public HttpHeader()
+        {
+            
+        }
+
         public HttpHeader(string name, string value)
         {
             if (string.IsNullOrEmpty(name)) throw new Exception("Name cannot be null");
