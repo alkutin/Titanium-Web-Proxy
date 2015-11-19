@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -54,13 +55,13 @@ namespace RemoteProxySite.Handlers
                     Delete(key);
                     context.Response.Write("Deleted");
                 }
-
-                context.Response.Write("Hello World");
-                throw new ArgumentOutOfRangeException("Unknown HTTP Method: " + context.Request.HttpMethod);
+                else                 
+                    throw new ArgumentOutOfRangeException("Unknown HTTP Method: " + context.Request.HttpMethod);
             }
             catch (Exception errorException)
             {
-                context.Response.StatusCode = 500;
+                Debug.WriteLine(errorException.ToString());
+                context.Response.StatusCode = 501;
                 context.Response.ContentType = "application/text-plain";
                 context.Response.Write(errorException.ToString());
             }

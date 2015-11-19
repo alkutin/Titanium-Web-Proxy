@@ -43,14 +43,19 @@ namespace Proxy.Encoding
                 var memoryStream = new MemoryStream();
                 task.Result.GetResponseStream().CopyTo(memoryStream);
                 var data = _encoder.Decode<EncodingResponseBody>(memoryStream.ToArray());
+                requestAsyncResult.ResponseBody = data;
                 if (onReceiveBody != null)
                 {
                     onReceiveBody(data);
                 }
 
-                EncodingAsyncResult removedItem;
-                if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))                
-                    removedItem.Dispose();
+                Task.Delay(5000).ContinueWith(t =>
+                {
+                    EncodingAsyncResult removedItem;
+
+                    if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))
+                        removedItem.Dispose();
+                });
             });
         }
 
@@ -63,6 +68,7 @@ namespace Proxy.Encoding
                 var memoryStream = new MemoryStream();
                 task.Result.GetResponseStream().CopyTo(memoryStream);
                 var data = _encoder.Decode<EncodingResponseHeader>(memoryStream.ToArray());
+                requestAsyncResult.ResponseHeaders = data;
                 if (onReceivedResponse != null)
                 {
                     onReceivedResponse(data);
@@ -82,7 +88,7 @@ namespace Proxy.Encoding
             var memoryStream = new MemoryStream();
             response.GetResponseStream().CopyTo(memoryStream);
             var key = _encoder.Decode<Guid>(memoryStream.ToArray());
-            var asyncResult = new EncodingAsyncResult { Key = key };
+            var asyncResult = new EncodingAsyncResult { Key = key, RequestHeaders = request.Key };
             _sessions.TryAdd(key, asyncResult);
 
             if (onComplete != null)            

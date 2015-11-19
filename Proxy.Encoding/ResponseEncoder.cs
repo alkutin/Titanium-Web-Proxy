@@ -49,25 +49,31 @@ namespace Proxy.Encoding
                     if (onComplete != null)
                         Task.Run(() => { onComplete(_encodingAsyncResult); });
 
-                    _proxyResponse = _proxyRequest.EndGetResponse(_headersResponseAsync);
-
-                    long contentLength;
-                    if (!long.TryParse(_proxyResponse.GetResponseHeader("Content-Length"), out contentLength))
-                        contentLength = 0;
-
-                    _encodingAsyncResult.ResponseHeaders = new EncodingResponseHeader
+                    Task.Run(() =>
                     {
-                        HttpCode = _proxyResponse.StatusCode,
-                        HttpDescription = _proxyResponse.StatusDescription,
-                        ContentEncoding = _proxyResponse.ContentEncoding,
-                        HasBody = contentLength != 0 || _proxyResponse.StatusCode != System.Net.HttpStatusCode.Created,
-                        ResponseHeaders = _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList()
-                    };
+                        _proxyResponse = _proxyRequest.EndGetResponse(response);
 
-                    var memStream = new MemoryStream();
-                    _proxyResponse.GetResponseStream().CopyToAsync(memStream).ContinueWith(w => {
-                        _encodingAsyncResult.ResponseBody = new EncodingResponseBody { Body = memStream.ToArray() };                        
-                    });                                                                                                                      
+                        long contentLength;
+                        if (!long.TryParse(_proxyResponse.GetResponseHeader("Content-Length"), out contentLength))
+                            contentLength = 0;
+
+                        _encodingAsyncResult.ResponseHeaders = new EncodingResponseHeader
+                        {
+                            HttpCode = _proxyResponse.StatusCode,
+                            HttpDescription = _proxyResponse.StatusDescription,
+                            ContentEncoding = _proxyResponse.ContentEncoding,
+                            HasBody = contentLength != 0 || _proxyResponse.StatusCode != System.Net.HttpStatusCode.Created,
+                            ResponseHeaders = _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList()
+                        };
+
+                        var memStream = new MemoryStream();
+                        _proxyResponse.GetResponseStream().CopyToAsync(memStream).ContinueWith(w =>
+                        {
+                            _encodingAsyncResult.ResponseBody = new EncodingResponseBody { Body = memStream.ToArray() };
+
+                        });
+                    });
+                    
                 }, this);
             });
             
