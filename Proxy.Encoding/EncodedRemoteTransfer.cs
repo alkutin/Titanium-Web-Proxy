@@ -74,6 +74,7 @@ namespace Proxy.Encoding
         {
             var httpRequest = WebRequest.CreateHttp(new Uri(Url));
             httpRequest.Method = "POST";
+            httpRequest.ContentType = "application/content-stream";
             var encodingRequest = _encoder.Encode(new EncodingRequest { Header = request.Key, Body = request.Value });
             httpRequest.GetRequestStream().Write(encodingRequest, 0, encodingRequest.Length);
 
@@ -94,6 +95,7 @@ namespace Proxy.Encoding
         {
             var request = WebRequest.CreateHttp(new Uri(string.Format("{0}?Key={1}&{2}", Url, key, additionalParams)));
             request.Method = httpMethod;
+            request.ContentType = "application/content-stream";
             return request;
         }
     }
