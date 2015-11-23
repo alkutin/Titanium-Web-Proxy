@@ -36,7 +36,7 @@ namespace Proxy.Encoding
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "Body=true");
+            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "B=true&P=0&S=0");
             var responseTask = httpRequest.GetResponseAsync();
             responseTask.ContinueWith(task =>
             {
@@ -61,7 +61,7 @@ namespace Proxy.Encoding
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
         {
-            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "body=false");
+            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "B=false&P=0&S=0");
             var responseTask = httpRequest.GetResponseAsync();
             responseTask.ContinueWith(task =>
             {
