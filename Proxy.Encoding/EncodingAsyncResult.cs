@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading;
@@ -86,12 +87,14 @@ namespace Proxy.Encoding
 
         public void WaitForBody()
         {
-            _bodyReceived.WaitOne();
+            if (!_bodyReceived.WaitOne(WaitTimeoutMSecs))
+                throw new IOException("Wait for Body Timeout");
         }
 
         public void WaitForHeader()
         {
-            _headerReceived.WaitOne();
+            if (!_headerReceived.WaitOne(WaitTimeoutMSecs))
+                throw new IOException("Wait for Header Timeout");
         }
 
         public void SetAsyncState(object asyncState)
@@ -101,6 +104,7 @@ namespace Proxy.Encoding
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
+        private const int WaitTimeoutMSecs = 60000;
 
         protected virtual void Dispose(bool disposing)
         {

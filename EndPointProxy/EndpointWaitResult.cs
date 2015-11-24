@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -66,9 +67,11 @@ namespace EndPointProxy
             //}, this);
             //task.Start();
             new Task((state) => {
-                InnerResult.AsyncWaitHandle.WaitOne();
+                
                 try
                 {
+                    if (!InnerResult.AsyncWaitHandle.WaitOne(WaitTimeoutMSecs))
+                        throw new IOException("Get Response Wait Timeout");
                     _webResponse = _proxyRequest.EndGetResponse(InnerResult);
                 }
                 catch (WebException webEx)
@@ -88,7 +91,8 @@ namespace EndPointProxy
         public static WebResponse EndGetResponse(IAsyncResult asyncResult)
         {
             var state = (EndpointWaitResult)asyncResult;
-            state._waitEvent.WaitOne();           
+            if (!state._waitEvent.WaitOne(WaitTimeoutMSecs))
+                throw new IOException("End Get Response Wait Timeout");
             return state._webResponse;
         }
 
@@ -99,6 +103,7 @@ namespace EndPointProxy
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
+        private const int WaitTimeoutMSecs = 60000;
 
         protected virtual void Dispose(bool disposing)
         {

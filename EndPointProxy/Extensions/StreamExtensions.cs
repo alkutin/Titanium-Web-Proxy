@@ -6,6 +6,8 @@ namespace EndPointProxy.Extensions
 {
     public static class StreamHelper
     {
+        private static int WaitTimeoutMSecs = 600000;
+
         public static void CopyToAsync(this Stream input, string initialData, Stream output, int bufferSize)
         {
             var bytes = Encoding.ASCII.GetBytes(initialData);
@@ -30,7 +32,8 @@ namespace EndPointProxy.Extensions
                 while (true)
                 {
                     // wait for the read operation to complete
-                    read.AsyncWaitHandle.WaitOne();
+                    if (!read.AsyncWaitHandle.WaitOne(WaitTimeoutMSecs))
+                        throw new IOException("Read Wait Timeout");
                     bufl[bufno] = input.EndRead(read);
 
                     // if zero bytes read, the copy is complete
@@ -43,7 +46,8 @@ namespace EndPointProxy.Extensions
                     // the only time one won't exist is after the very first read operation completes
                     if (write != null)
                     {
-                        write.AsyncWaitHandle.WaitOne();
+                        if (!write.AsyncWaitHandle.WaitOne(WaitTimeoutMSecs))
+                            throw new IOException("Write Wait Timeout");
                         output.EndWrite(write);
                     }
 
@@ -63,7 +67,8 @@ namespace EndPointProxy.Extensions
                 // the only time one won't exist is if the input stream is empty.
                 if (write != null)
                 {
-                    write.AsyncWaitHandle.WaitOne();
+                    if (!write.AsyncWaitHandle.WaitOne(WaitTimeoutMSecs))
+                        throw new IOException("Close Write Wait Timeout");
                     output.EndWrite(write);
                 }
 
