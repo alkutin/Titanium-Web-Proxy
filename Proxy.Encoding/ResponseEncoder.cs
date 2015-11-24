@@ -30,7 +30,7 @@ namespace Proxy.Encoding
             _requestBody = request.Value;
             _proxyRequest = new EndPointProxyRequest(_requestHeaders.RequestUri, _requestHeaders.HttpMethod, Version.Parse(_requestHeaders.Version));
             _proxyRequest.SetRequestHeaders(_requestHeaders.RequestHeaders);
-
+            
             _encodingAsyncResult = new EncodingAsyncResult()
             {
                 Key = Guid.NewGuid(),

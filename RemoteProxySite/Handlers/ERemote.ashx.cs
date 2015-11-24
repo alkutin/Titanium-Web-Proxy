@@ -10,6 +10,8 @@ using System.Web;
 using System.Web.Http;
 using Proxy.Encoding;
 using RemoteProxySite.Models;
+using ProxyLanguage.Models;
+using System.Globalization;
 
 namespace RemoteProxySite.Handlers
 {
@@ -120,6 +122,9 @@ namespace RemoteProxySite.Handlers
 
             var encoder = new ResponseEncoder();
             var info = new ResponseTuple { RequestHeader = request.Header, RequestBody = request.Body };
+
+            if (request.Header.HttpMethod == "POST" && !request.Header.RequestHeaders.Any(w => w.Name == "Content-Length"))
+                request.Header.RequestHeaders.Add(new HttpHeader { Name = "Content-Length", Value = request.Body.Body.Length.ToString(CultureInfo.InvariantCulture) });
 
             info.AsyncResult = encoder.SendRequestAsync(new KeyValuePair<EncodingRequestHeader, EncodingRequestBody>(request.Header, request.Body),
                 (complete) =>

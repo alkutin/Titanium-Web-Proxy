@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.IO.Compression;
 using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
@@ -22,16 +23,41 @@ namespace Proxy.Encoding
             _iv = iv;
         }
 
+        private byte[] Compress(byte[] source)
+        {
+            var rezStream = new MemoryStream();
+
+            using (var stream = new GZipStream(rezStream, CompressionMode.Compress, true))
+            {
+                stream.Write(source, 0, source.Length);
+                stream.Flush();                
+            }
+
+            return rezStream.ToArray();
+        }
+
+        private byte[] Decompress(byte[] source)
+        {
+            var rezStream = new MemoryStream();
+
+            using (var stream = new GZipStream(new MemoryStream(source), CompressionMode.Decompress, true))
+            {                
+                stream.CopyTo(rezStream);                
+            }
+
+            return rezStream.ToArray();
+        }
+
         public byte[] Encode(object source)
         {
             var encoder = new JavaScriptSerializer();
             var sRez = encoder.Serialize(source);
-            return Encode(System.Text.Encoding.Unicode.GetBytes(sRez));
+            return Encode(Compress(System.Text.Encoding.Unicode.GetBytes(sRez)));
         }
 
         public T Decode<T>(byte[] encoded)
         {
-            var decrypted = System.Text.Encoding.Unicode.GetString(Decode(encoded));
+            var decrypted = System.Text.Encoding.Unicode.GetString(Decompress(Decode(encoded)));
             var encoder = new JavaScriptSerializer();
             return encoder.Deserialize<T>(decrypted);
         }
