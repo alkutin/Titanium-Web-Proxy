@@ -37,9 +37,11 @@ namespace RemoteProxySite.Handlers
 
                 if (context.Request.HttpMethod == "GET")
                 {
-                    var key = Guid.Parse(context.Request.Params["key"]);
-                    var body = bool.Parse(context.Request.Params["Body"]);
-                    var buffer = Get(key, body);
+                    var key = Guid.Parse(context.Request.Params["Key"]);
+                    var body = bool.Parse(context.Request.Params["B"]);
+                    var position = int.Parse(context.Request.Params["P"]);
+                    var size = int.Parse(context.Request.Params["S"]);
+                    var buffer = Get(key, body, position, size);
                     
                     context.Response.BinaryWrite(buffer);
                 } 
@@ -75,20 +77,34 @@ namespace RemoteProxySite.Handlers
             }
         }
 
-        public byte[] Get(Guid key, bool body)
+        public byte[] Get(Guid key, bool body, int position, int size)
         {
             ResponseTuple info;
             if (_sessions.TryGetValue(key, out info))
             {
+                EncodingResponseBody eBody = null;
                 if (body)
                 {
                     info.AsyncResult.WaitForBody();
-                    Task.Delay(1000).ContinueWith((task) =>
+                    if (position == 0 && size == 0)
+                        eBody = info.ResponseBody;
+                    else
+                    {                        
+                        eBody = new EncodingResponseBody
+                        {
+                            Body = info.ResponseBody.Body.Skip(position).Take(size).ToArray()
+                        };
+                    }
+
+                    if (size == 0 || size != eBody.Body.Length)
                     {
-                        ((IDisposable)info.AsyncResult).Dispose();
-                        ResponseTuple removedInfo;
-                        _sessions.TryRemove(key, out removedInfo);
-                    });
+                        Task.Delay(10000).ContinueWith((task) =>
+                        {
+                            ((IDisposable)info.AsyncResult).Dispose();
+                            ResponseTuple removedInfo;
+                            _sessions.TryRemove(key, out removedInfo);
+                        });
+                    }
                 }
                 else info.AsyncResult.WaitForHeader();
 
