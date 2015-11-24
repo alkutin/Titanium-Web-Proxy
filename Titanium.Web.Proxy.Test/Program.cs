@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Configuration;
 using System.Runtime.InteropServices;
 
 namespace Titanium.Web.Proxy.Test
@@ -12,23 +13,12 @@ namespace Titanium.Web.Proxy.Test
             //On Console exit make sure we also exit the proxy
             NativeMethods.Handler = ConsoleEventCallback;
             NativeMethods.SetConsoleCtrlHandler(NativeMethods.Handler, true);
+            
+            Controller.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["MonitorHTTPS"]);
+            Console.WriteLine("Monitor HTTPS: {0}", Controller.EnableSsl);
 
-
-            Console.Write("Do you want to monitor HTTPS? (Y/N):");
-
-            var readLine = Console.ReadLine();
-            if (readLine != null && readLine.Trim().ToLower() == "y")
-            {
-                Controller.EnableSsl = true;
-            }
-
-            Console.Write("Do you want to set this as a System Proxy? (Y/N):");
-
-            var line = Console.ReadLine();
-            if (line != null && line.Trim().ToLower() == "y")
-            {
-                Controller.SetAsSystemProxy = true;
-            }
+            Controller.SetAsSystemProxy = bool.Parse(ConfigurationManager.AppSettings["SystemProxy"]);
+            Console.WriteLine("Set this as a System Proxy: {0}", Controller.SetAsSystemProxy);
 
             //Start proxy controller
             Controller.StartProxy();

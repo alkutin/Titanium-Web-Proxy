@@ -73,6 +73,10 @@ namespace Titanium.Web.Proxy.Test
         //Insert script to read the Browser URL and send it back to proxy
         public void OnResponse(object sender, SessionEventArgs e)
         {
+            var oldColor = Console.ForegroundColor;
+            Console.ForegroundColor = e.ResponseStatusCode >= System.Net.HttpStatusCode.BadRequest ? ConsoleColor.Red : ConsoleColor.Green;
+            Console.WriteLine("{0} {1}", e.RequestUrl, e.ResponseStatusCode);
+            Console.ForegroundColor = oldColor;
             ////read response headers
             //var responseHeaders = e.ResponseHeaders;
 
