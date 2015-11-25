@@ -146,6 +146,7 @@ namespace RemoteProxySite.Handlers
                         {
                             info.ResponseBody = new EncodingResponseBody { Body = File.ReadAllBytes(file) };
                             info.ResponseHeader.ETag = info.ResponseBody.Body.GetMD5();
+                            info.ResponseHeader.ResponseHeaders.SetHeader("Content-Length", info.ResponseBody.Body.Length.ToString());
                         }
                     }
                     catch (Exception error)

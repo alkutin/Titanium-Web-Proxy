@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace ProxyLanguage.Models
 {
@@ -23,6 +25,22 @@ namespace ProxyLanguage.Models
         public override string ToString()
         {
             return string.Format("{0}: {1}", Name, Value);
+        }
+    }
+
+    public static class HeaderHelper
+    {
+        public static void SetHeader(this List<HttpHeader> headers, string name, string value)
+        {
+            var item = headers.FirstOrDefault(w => w.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            if (item == null)
+            {
+                item = new HttpHeader(name, value);
+                headers.Add(item);
+            }
+
+            item.Name = name;
+            item.Value = value;
         }
     }
 }
