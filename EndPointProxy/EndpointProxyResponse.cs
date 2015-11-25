@@ -33,7 +33,7 @@ namespace EndPointProxy
         {
             get
             {
-                if (_headers == null)
+                if (_headers == null && _proxyResponse != null)
                     _headers = _proxyResponse.Headers.AllKeys.ToDictionary(k => k, v => _proxyResponse.Headers[v]);
                 return _headers;
             }               

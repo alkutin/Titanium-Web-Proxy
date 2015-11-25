@@ -15,6 +15,7 @@ namespace Proxy.Encoding
         public string HttpDescription;
         public List<HttpHeader> ResponseHeaders;
 
+        public string ETag;
         public string ContentEncoding { get; set; }
     }
 }

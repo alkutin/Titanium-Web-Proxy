@@ -6,7 +6,7 @@ using System.Text;
 namespace Proxy.Encoding
 {
     public class EncodingResponseBody
-    {
+    {        
         public byte[] Body;
     }
 }

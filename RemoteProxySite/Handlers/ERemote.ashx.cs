@@ -134,8 +134,21 @@ namespace RemoteProxySite.Handlers
             encoder.ReceiveResponseHeaderAsync(info.AsyncResult, (responseHeaders) =>
             {
                 info.ResponseHeader = responseHeaders;
+                var file = string.Empty;
+
+                if (!string.IsNullOrEmpty(responseHeaders.ETag))
+                {
+                    file = Path.Combine(Path.GetTempPath(), "ERemoteCache",
+                        Encoding.ASCII.GetBytes(responseHeaders.ETag).GetMD5());
+                    if (File.Exists(file))
+                    {
+
+                    }
+                }
+
                 encoder.ReceiveResponseBodyAsync(info.AsyncResult, (responseBody) =>
                 {
+                    info.ResponseHeader.ETag = responseBody.Body.GetMD5();
                     info.ResponseBody = responseBody;
                 });
             });
