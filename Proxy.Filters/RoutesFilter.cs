@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
+using ProxyLanguage.Models;
 
 namespace Proxy.Filters
 {
@@ -97,6 +98,7 @@ namespace Proxy.Filters
                                 ResponseHeaders = new List<ProxyLanguage.Models.HttpHeader>()
                             }
                         };
+                        rez.ResponseHeaders.ResponseHeaders.SetHeader("Content-Length", "0");
                         Task.Run(() => { onComplete(rez); });
                         return rez;
                     };

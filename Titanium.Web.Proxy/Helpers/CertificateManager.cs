@@ -3,6 +3,7 @@ using System.IO;
 using System.Diagnostics;
 using System.Collections.Generic;
 using System.Security.Cryptography.X509Certificates;
+using System.Globalization;
 
 namespace Titanium.Web.Proxy.Helpers
 {
@@ -165,7 +166,7 @@ namespace Titanium.Web.Proxy.Helpers
             bool isRootCertificate =
                 (certificateName == RootCertificateName);
 
-            string certCreatArgs = string.Format(CertCreateFormat,
+            string certCreatArgs = string.Format(CultureInfo.InvariantCulture, CertCreateFormat,
                 store.Name, certificateName, Issuer,
                 isRootCertificate ? "signature" : "exchange",
                 isRootCertificate ? "authority" : "end", DateTime.Now,

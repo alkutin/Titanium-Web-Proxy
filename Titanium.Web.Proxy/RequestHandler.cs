@@ -101,8 +101,9 @@ namespace Titanium.Web.Proxy
                         clientStream = sslStream;
                     }
 
-                    catch
+                    catch(Exception error)
                     {
+                        Trace.TraceError(error.ToString());
                         if (sslStream != null)
                             sslStream.Dispose();
 
