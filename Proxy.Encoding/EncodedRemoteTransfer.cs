@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Configuration;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -61,6 +62,8 @@ namespace Proxy.Encoding
                     {
                         onReceiveBody(requestAsyncResult.ResponseBody);
                     }
+
+                    Debug.WriteLine(string.Concat("Returned from cache: ", eTag));
                     return;
                 }
             }
@@ -118,6 +121,7 @@ namespace Proxy.Encoding
             var httpRequest = WebRequest.CreateHttp(new Uri(Url));
             httpRequest.Method = "POST";
             httpRequest.ContentType = "application/content-stream";
+            httpRequest.Proxy = null;
             var encodingRequest = _encoder.Encode(new EncodingRequest { Header = request.Key, Body = request.Value });
             httpRequest.GetRequestStream().Write(encodingRequest, 0, encodingRequest.Length);
 
@@ -139,6 +143,7 @@ namespace Proxy.Encoding
             var request = WebRequest.CreateHttp(new Uri(string.Format("{0}?Key={1}&{2}", Url, key, additionalParams)));
             request.Method = httpMethod;
             request.ContentType = "application/content-stream";
+            request.Proxy = null;
             return request;
         }
     }

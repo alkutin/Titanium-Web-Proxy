@@ -69,6 +69,7 @@
     <Reference Include="System.DirectoryServices.Protocols" />
     <Reference Include="System.ServiceModel" />
     <Reference Include="System.ServiceModel.Discovery" />
+    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -86,6 +87,7 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <None Include="Routes.json" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Titanium.Web.Proxy\Titanium.Web.Proxy.csproj">

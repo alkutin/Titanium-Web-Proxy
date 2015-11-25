@@ -127,6 +127,10 @@
       <Project>{94af08d8-960e-4b4c-ad38-87e7ed0b6241}</Project>
       <Name>Proxy.Encoding</Name>
     </ProjectReference>
+    <ProjectReference Include="..\Proxy.Filters\Proxy.Filters.csproj">
+      <Project>{bd91e775-f879-4b0a-b2ad-6351588f1a77}</Project>
+      <Name>Proxy.Filters</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ProxyLanguage\ProxyLanguage.csproj">
       <Project>{5eeb4789-0f7f-494f-ad19-d2a9390767c2}</Project>
       <Name>ProxyLanguage</Name>
