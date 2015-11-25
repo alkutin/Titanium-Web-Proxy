@@ -44,7 +44,7 @@ namespace Proxy.Encoding
             {
                 var file = Path.Combine(folder, eTag);
                 if (File.Exists(file))
-                {
+                {                    
                     requestAsyncResult.ResponseBody = new EncodingResponseBody 
                     { 
                         Body = File.ReadAllBytes(file)

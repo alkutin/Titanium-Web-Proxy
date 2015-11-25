@@ -140,10 +140,17 @@ namespace RemoteProxySite.Handlers
                 {
                     file = Path.Combine(Path.GetTempPath(), "ERemoteCache",
                         Encoding.ASCII.GetBytes(responseHeaders.ETag).GetMD5());
-                    if (File.Exists(file))
+                    try
                     {
-                        info.ResponseBody = new EncodingResponseBody { Body = File.ReadAllBytes(file) };
-                        info.ResponseHeader.ETag = info.ResponseBody.Body.GetMD5();                        
+                        if (File.Exists(file))
+                        {
+                            info.ResponseBody = new EncodingResponseBody { Body = File.ReadAllBytes(file) };
+                            info.ResponseHeader.ETag = info.ResponseBody.Body.GetMD5();
+                        }
+                    }
+                    catch (Exception error)
+                    {
+                        Trace.TraceError(error.ToString());
                     }
                 }
 
@@ -153,12 +160,19 @@ namespace RemoteProxySite.Handlers
                         info.ResponseHeader.ETag = responseBody.Body.GetMD5();
                         info.ResponseBody = responseBody;
 
-                        if (!string.IsNullOrEmpty(file))
+                        try
                         {
-                            var folder = Path.GetDirectoryName(file);
-                            if (!Directory.Exists(folder))
-                                Directory.CreateDirectory(folder);
-                            File.WriteAllBytes(file, info.ResponseBody.Body);
+                            if (!string.IsNullOrEmpty(file))
+                            {
+                                var folder = Path.GetDirectoryName(file);
+                                if (!Directory.Exists(folder))
+                                    Directory.CreateDirectory(folder);
+                                File.WriteAllBytes(file, info.ResponseBody.Body);
+                            }
+                        }
+                        catch(Exception error)
+                        {
+                            Trace.TraceError(error.ToString());
                         }
                     });
             });

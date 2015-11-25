@@ -37,11 +37,18 @@ namespace Proxy.Filters
             _enableForbiden = bool.Parse(ConfigurationManager.AppSettings["EnableForbiden"]);
             _enableSelectiveProxy = bool.Parse(ConfigurationManager.AppSettings["EnableSelectiveProxy"]);
 
-            LoadRoutesFile();
-
-            _watcher = new FileSystemWatcher(_path);
-            _watcher.Changed += RoutesFileChanged;
-            _watcher.WaitForChanged(WatcherChangeTypes.Changed);
+            try
+            {
+                LoadRoutesFile();
+             
+                _watcher = new FileSystemWatcher(Path.GetDirectoryName(_path), Path.GetFileName(_path));
+                _watcher.Changed += RoutesFileChanged;                
+                _watcher.EnableRaisingEvents = true;
+            }
+            catch(Exception error)
+            {
+                Console.WriteLine(error.ToString());
+            }
         }
 
         private static void LoadRoutesFile()
