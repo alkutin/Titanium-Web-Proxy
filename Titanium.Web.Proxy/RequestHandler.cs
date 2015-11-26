@@ -202,7 +202,8 @@ namespace Titanium.Web.Proxy
 
 
                 //construct the web request that we are going to issue on behalf of the client.
-                args.ProxyRequest = new RequestEncoder(new RoutesFilter(new EncodedRemoteTransfer()), httpRemoteUri, httpMethod, version);//
+                args.ProxyRequest = new RequestEncoder(new RoutesFilter(new EncodedRemoteTransfer(),
+                    new ResponseEncoder()), httpRemoteUri, httpMethod, version);//
                 //new EndPointProxyRequest(httpRemoteUri, httpMethod, version);// (HttpWebRequest) WebRequest.Create(httpRemoteUri); 
                 SetRequestHeaders(args.RequestHeaders, args.ProxyRequest);
 

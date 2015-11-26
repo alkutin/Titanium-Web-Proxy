@@ -20,15 +20,21 @@ namespace Proxy.Filters
         private static FileSystemWatcher _watcher;
         private static string _path;
         private static RoutesConfig _config;
+        private IEncodedTransfer _skip;
+
+        private IEncodedTransfer _current;
 
         static RoutesFilter()
         {
             Init();
         }
 
-        public RoutesFilter(IEncodedTransfer next)
+        public RoutesFilter(IEncodedTransfer next, IEncodedTransfer skip)
         {
-            _next = next;            
+            _next = next;
+            _skip = skip;
+
+            _current = _skip;
         }
 
         private static void Init()
@@ -65,17 +71,17 @@ namespace Proxy.Filters
 
         public void Abort(IEncodedAsyncResult requestAsyncResult)
         {
-            _next.Abort(requestAsyncResult);
+            _current.Abort(requestAsyncResult);
         }
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            _next.ReceiveResponseBodyAsync(requestAsyncResult, onReceiveBody);
+            _current.ReceiveResponseBodyAsync(requestAsyncResult, onReceiveBody);
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
         {
-            _next.ReceiveResponseHeaderAsync(requestAsyncResult, onReceivedResponse);
+            _current.ReceiveResponseHeaderAsync(requestAsyncResult, onReceivedResponse);
         }
 
         public IEncodedAsyncResult SendRequestAsync(KeyValuePair<EncodingRequestHeader, EncodingRequestBody> request, Action<IEncodedAsyncResult> onComplete)
@@ -104,7 +110,20 @@ namespace Proxy.Filters
                     };
             }
 
-            return _next.SendRequestAsync(request, onComplete);
+            if (_enableSelectiveProxy)
+            {
+                foreach (var agent in _config.Proxy)
+                {
+                    if (agent.Key.Equals(request.Key.RequestHeaders.GetHeader("User-Agent")))
+                    {
+                        _current = _next;
+                        break;
+                    }
+                }
+            }
+            else _current = _next;
+
+            return _current.SendRequestAsync(request, onComplete);
         }
     }
 }

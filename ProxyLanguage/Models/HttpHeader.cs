@@ -42,5 +42,11 @@ namespace ProxyLanguage.Models
             item.Name = name;
             item.Value = value;
         }
+
+        public static string GetHeader(this List<HttpHeader> headers, string name)
+        {
+            var item = headers.FirstOrDefault(w => w.Name.Equals(name, StringComparison.CurrentCultureIgnoreCase));
+            return item == null ? string.Empty : item.Value;
+        }
     }
 }
