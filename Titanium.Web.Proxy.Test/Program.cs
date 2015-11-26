@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Configuration;
 using System.Runtime.InteropServices;
+using System.Security.Permissions;
 
 namespace Titanium.Web.Proxy.Test
 {
@@ -8,6 +9,7 @@ namespace Titanium.Web.Proxy.Test
     {
         private static readonly ProxyTestController Controller = new ProxyTestController();
 
+        [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         public static void Main(string[] args)
         {
             //On Console exit make sure we also exit the proxy

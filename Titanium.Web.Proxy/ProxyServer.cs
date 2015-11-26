@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Helpers;
 using System.Configuration;
+using Proxy.Filters;
 
 namespace Titanium.Web.Proxy
 {
@@ -74,6 +75,9 @@ namespace Titanium.Web.Proxy
 
         public static void Initialize()
         {
+            RoutesFilter.Init();
+            Console.WriteLine(typeof(RoutesFilter).FullName + " initialized");
+
             ServicePointManager.Expect100Continue = false;
             WebRequest.DefaultWebProxy = null;
             ServicePointManager.DefaultConnectionLimit = 10;
@@ -96,7 +100,7 @@ namespace Titanium.Web.Proxy
 
 
         public static bool Start()
-        {
+        {            
             _listener = new TcpListener(ListeningIpAddress, ListeningPort);
             _listener.Start();
 

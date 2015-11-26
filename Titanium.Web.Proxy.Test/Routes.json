@@ -4,6 +4,7 @@
     "stats.g.doubleclick.net",
     "statistic.doubleclick.net",
     "mc.yandex.ru",
+    "google-analytics.com",
     "www.google-analytics.com",
     "montblanc.rambler.ru",
     "www.tns-counter.ru",
@@ -14,6 +15,8 @@
   "proxy": {
     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0": [
     ],
-    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 YaBrowser/15.10.2454.3865 Safari/537.36": [ ]
+    "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/45.0.2454.101 YaBrowser/15.10.2454.3865 Safari/537.36": [
+      ".vk.com", ".vk.me", ".google.com", ".google.ru", ".gmail.com", ".yandex.ru", ".yandex.net", ".yastatic.net"
+    ]
   }
 }
