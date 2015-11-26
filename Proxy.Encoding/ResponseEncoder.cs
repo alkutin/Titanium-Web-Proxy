@@ -55,7 +55,7 @@ namespace Proxy.Encoding
 
                         long contentLength;
                         if (!long.TryParse(_proxyResponse.GetResponseHeader("Content-Length"), out contentLength))
-                            contentLength = 0;
+                            contentLength = int.MaxValue;
 
                         _encodingAsyncResult.ResponseHeaders = new EncodingResponseHeader
                         {
@@ -70,7 +70,7 @@ namespace Proxy.Encoding
                         var memStream = new MemoryStream();
                         _proxyResponse.GetResponseStream().CopyToAsync(memStream).ContinueWith(w =>
                         {
-                            _encodingAsyncResult.ResponseBody = new EncodingResponseBody { Body = memStream.ToArray() };
+                            _encodingAsyncResult.ResponseBody = new PlainEncodingResponseBody { PlainBody = memStream.ToArray() };
 
                         });
                     });

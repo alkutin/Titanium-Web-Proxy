@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -69,7 +70,15 @@ namespace EndPointProxy
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            return _innerStream.Read(buffer, offset, count);
+            try
+            {
+                return _innerStream.Read(buffer, offset, count);
+            }
+            catch (IOException ioError)
+            {
+                Debug.WriteLine(ioError.ToString());
+                return 0;
+            }
         }
 
         public override long Seek(long offset, SeekOrigin origin)

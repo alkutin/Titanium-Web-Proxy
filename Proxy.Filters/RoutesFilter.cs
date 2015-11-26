@@ -117,7 +117,7 @@ namespace Proxy.Filters
                         {
                             Key = Guid.Empty,
                             RequestHeaders = request.Key,
-                            ResponseBody = new EncodingResponseBody { Body = new byte[0] },
+                            ResponseBody = new PlainEncodingResponseBody { PlainBody = new byte[0] },
                             ResponseHeaders = new EncodingResponseHeader {
                                 ContentEncoding = string.Empty,
                                 ETag = string.Empty,

@@ -137,7 +137,7 @@ namespace Proxy.Encoding
                             {
                                 _encodedTransfer.ReceiveResponseBodyAsync(requestSent, (body) => 
                                 {
-                                    Debug.WriteLine("Returned body: " + body.Body.Length);
+                                    Debug.WriteLine("Returned body: " + body.GetBody().Length);
                                 });
                             }
                         });

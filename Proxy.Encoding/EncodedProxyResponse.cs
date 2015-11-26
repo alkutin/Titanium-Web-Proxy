@@ -10,7 +10,7 @@ namespace Proxy.Encoding
     public class EncodedProxyResponse : IProxyResponse
     {
         private IEncodedAsyncResult _asyncResult;
-        private MemoryStream _stream;
+        private Stream _stream;
 
         public EncodedProxyResponse(IEncodedAsyncResult asyncResult)
         {
@@ -78,7 +78,7 @@ namespace Proxy.Encoding
             if (_stream == null)
             {
                 _asyncResult.WaitForBody();
-                _stream = new MemoryStream(_asyncResult.ResponseBody.Body);
+                _stream = _asyncResult.ResponseBody.GetBody();
             }
 
             return _stream;

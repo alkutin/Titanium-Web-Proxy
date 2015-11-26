@@ -91,14 +91,23 @@ namespace RemoteProxySite.Handlers
                     if (position == 0 && size == 0)
                         eBody = info.ResponseBody;
                     else
-                    {                        
-                        eBody = new EncodingResponseBody
-                        {
-                            Body = info.ResponseBody.Body.Skip(position).Take(size).ToArray()
+                    {                   
+                        var bodyStream = info.ResponseBody.GetBody();
+                        if (bodyStream.Position != position)
+                            bodyStream.Seek(position, SeekOrigin.Begin);
+                        var buffer = new byte[size];
+                        var readSize = bodyStream.Read(buffer, 0, size);
+                        var readBuffer = readSize != size ? new byte[readSize] : buffer;
+                        if (readSize != size)
+                            Array.Copy(buffer, 0, readBuffer, 0, readSize);
+                        
+                        eBody = new PlainEncodingResponseBody
+                        { 
+                            PlainBody = readBuffer
                         };
                     }
 
-                    if (size == 0 || size != eBody.Body.Length)
+                    if (size == 0 || size != eBody.GetBody().Length)
                     {
                         Task.Delay(10000).ContinueWith((task) =>
                         {
@@ -144,9 +153,10 @@ namespace RemoteProxySite.Handlers
                     {
                         if (File.Exists(file))
                         {
-                            info.ResponseBody = new EncodingResponseBody { Body = File.ReadAllBytes(file) };
-                            info.ResponseHeader.ETag = info.ResponseBody.Body.GetMD5();
-                            info.ResponseHeader.ResponseHeaders.SetHeader("Content-Length", info.ResponseBody.Body.Length.ToString());
+                            var body = new PlainEncodingResponseBody { PlainBody = File.ReadAllBytes(file) };
+                            info.ResponseBody = body;
+                            info.ResponseHeader.ETag = body.PlainBody.GetMD5();
+                            info.ResponseHeader.ResponseHeaders.SetHeader("Content-Length", body.PlainBody.Length.ToString());
                         }
                     }
                     catch (Exception error)
@@ -158,17 +168,17 @@ namespace RemoteProxySite.Handlers
                 if (info.ResponseBody == null)
                     encoder.ReceiveResponseBodyAsync(info.AsyncResult, (responseBody) =>
                     {
-                        info.ResponseHeader.ETag = responseBody.Body.GetMD5();
+                        //info.ResponseHeader.ETag = responseBody.PlainBody.GetMD5();
                         info.ResponseBody = responseBody;
-
+                        
                         try
                         {
-                            if (!string.IsNullOrEmpty(file))
+                            if (!string.IsNullOrEmpty(file) && responseBody.GetBody() is MemoryStream)
                             {
                                 var folder = Path.GetDirectoryName(file);
                                 if (!Directory.Exists(folder))
                                     Directory.CreateDirectory(folder);
-                                File.WriteAllBytes(file, info.ResponseBody.Body);
+                                File.WriteAllBytes(file, ((MemoryStream)info.ResponseBody.GetBody()).ToArray());
                             }
                         }
                         catch(Exception error)

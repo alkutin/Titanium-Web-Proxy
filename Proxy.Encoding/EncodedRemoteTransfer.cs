@@ -39,16 +39,16 @@ namespace Proxy.Encoding
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
             var folder = Path.Combine(Path.GetTempPath(), "ERemoteCache");
-            var eTag = requestAsyncResult.ResponseHeaders.ETag;
+            var eTag = requestAsyncResult.ResponseHeaders.ETag.Replace("/", "_").Replace("\\", "_").Replace("\"", "_");
 
             if (!string.IsNullOrEmpty(eTag))
             {
                 var file = Path.Combine(folder, eTag);
                 if (File.Exists(file))
                 {                    
-                    requestAsyncResult.ResponseBody = new EncodingResponseBody 
+                    requestAsyncResult.ResponseBody = new PlainEncodingResponseBody 
                     { 
-                        Body = File.ReadAllBytes(file)
+                        PlainBody = File.ReadAllBytes(file)
                     };
                     
                     Task.Delay(5000).ContinueWith(t =>
@@ -69,35 +69,60 @@ namespace Proxy.Encoding
                 }
             }
 
-            var httpRequest = CreateRequest("GET", requestAsyncResult.Key, "B=true&P=0&S=0");
-            var responseTask = httpRequest.GetResponseAsync();
-            responseTask.ContinueWith(task =>
+            long contentLength = 0;
+            if (!long.TryParse(requestAsyncResult.ResponseHeaders.ResponseHeaders.GetHeader("Content-Length"),
+                out contentLength))
+                contentLength = int.MaxValue;
+
+            requestAsyncResult.ResponseBody = new StreamEncodingResponseBody
             {
-                var memoryStream = new MemoryStream();
-                task.Result.GetResponseStream().CopyTo(memoryStream);
-                var data = _encoder.Decode<EncodingResponseBody>(memoryStream.ToArray());
-                requestAsyncResult.ResponseBody = data;
+                BodyStream = new ReadByEventStream(
+                    requestAsyncResult.ResponseHeaders.HasBody ?
+                    contentLength : 0,
+                    new Func<long, long, byte[]>((position, blockSize) =>
+                    {
 
-                var file = Path.Combine(folder, eTag);
-                var fullFolder = Path.GetDirectoryName(file);
-                if (!Directory.Exists(fullFolder))
-                    Directory.CreateDirectory(fullFolder);
+                        var httpRequest = CreateRequest("GET", requestAsyncResult.Key,
+                            string.Format("B=true&P={0}&S={1}", position, blockSize));
+                        var response = httpRequest.GetResponse();
 
-                File.WriteAllBytes(file, data.Body);
+                        var memoryStream = new MemoryStream();
+                        response.GetResponseStream().CopyTo(memoryStream);
+                        var data = _encoder.Decode<PlainEncodingResponseBody>(memoryStream.ToArray());
 
-                Task.Delay(5000).ContinueWith(t =>
-                {
-                    EncodingAsyncResult removedItem;
+                        if (position == 0 && blockSize != data.PlainBody.Length)
+                        {
+                            try
+                            {
+                                var file = Path.Combine(folder, eTag);
+                                var fullFolder = Path.GetDirectoryName(file);
+                                if (!Directory.Exists(fullFolder))
+                                    Directory.CreateDirectory(fullFolder);
+                                File.WriteAllBytes(file, data.PlainBody);
+                            }
+                            catch (Exception error)
+                            {
+                                Trace.TraceError(error.ToString());
+                            }
 
-                    if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))
-                        removedItem.Dispose();
-                });
+                            Task.Delay(5000).ContinueWith(t =>
+                            {
+                                EncodingAsyncResult removedItem;
 
-                if (onReceiveBody != null)
-                {
-                    onReceiveBody(data);
-                }
-            });
+                                if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))
+                                    removedItem.Dispose();
+                            });
+                        }
+
+                        return data.PlainBody;
+                    })
+                )
+            };
+
+            if (onReceiveBody != null)
+            {
+                onReceiveBody(requestAsyncResult.ResponseBody);
+            }
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)

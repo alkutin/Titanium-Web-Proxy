@@ -51,7 +51,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _proxyResponse.StatusCode;
+                return _proxyResponse != null ? _proxyResponse.StatusCode : HttpStatusCode.ServiceUnavailable;
             }
         }
 
@@ -59,7 +59,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _proxyResponse.StatusDescription;
+                return _proxyResponse != null ? _proxyResponse.StatusDescription : "Service Unavaiable";
             }
         }
 
@@ -76,6 +76,9 @@ namespace EndPointProxy
 
         public string GetResponseHeader(string name)
         {
+            if (Headers == null)
+                return string.Empty;
+
             foreach (var header in Headers)
             {
                 if (header.Key.Equals(name, StringComparison.InvariantCultureIgnoreCase))

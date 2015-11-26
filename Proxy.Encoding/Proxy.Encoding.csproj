@@ -55,6 +55,7 @@
     <Compile Include="IEncodedTransfer.cs" />
     <Compile Include="MD5Helper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReadByEventStream.cs" />
     <Compile Include="RequestEncoder.cs" />
     <Compile Include="ResponseEncoder.cs" />
   </ItemGroup>
