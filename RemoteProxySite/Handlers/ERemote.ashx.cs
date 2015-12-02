@@ -82,6 +82,7 @@ namespace RemoteProxySite.Handlers
         public byte[] Get(Guid key, bool body, int position, int size)
         {
             ResponseTuple info;
+            var readPosition = 0;
             if (_sessions.TryGetValue(key, out info))
             {
                 EncodingResponseBody eBody = null;
@@ -89,20 +90,28 @@ namespace RemoteProxySite.Handlers
                 {
                     info.AsyncResult.WaitForBody();
                     if (position == 0 && size == 0)
+                    {
                         eBody = info.ResponseBody;
+                    }
                     else
-                    {                   
+                    {
                         var bodyStream = info.ResponseBody.GetBody();
                         if (bodyStream.Position != position)
-                            bodyStream.Seek(position, SeekOrigin.Begin);
+                        {
+                            var newPosition = bodyStream.Seek(position, SeekOrigin.Begin);
+                            if (newPosition != position)
+                                throw new ArgumentOutOfRangeException("position");
+                        }
+                        readPosition = position;
                         var buffer = new byte[size];
                         var readSize = bodyStream.Read(buffer, 0, size);
                         var readBuffer = readSize != size ? new byte[readSize] : buffer;
                         if (readSize != size)
                             Array.Copy(buffer, 0, readBuffer, 0, readSize);
-                        
+
                         eBody = new PlainEncodingResponseBody
-                        { 
+                        {
+                            Position =  readPosition,
                             PlainBody = readBuffer
                         };
                     }
@@ -119,7 +128,7 @@ namespace RemoteProxySite.Handlers
                 }
                 else info.AsyncResult.WaitForHeader();
 
-                return _encoder.Encode(body ? (object)info.ResponseBody : info.ResponseHeader);
+                return _encoder.Encode(body ? (object)eBody : info.ResponseHeader);
             }
             else return new byte[0];
         }
@@ -148,7 +157,7 @@ namespace RemoteProxySite.Handlers
                 if (!string.IsNullOrEmpty(responseHeaders.ETag))
                 {
                     file = Path.Combine(Path.GetTempPath(), "ERemoteCache",
-                        Encoding.ASCII.GetBytes(responseHeaders.ETag).GetMD5());
+                        Encoding.ASCII.GetBytes(responseHeaders.ETag).GetMD5().Replace("/", "_").Replace("\\", "_").Replace("\"", "_")) + ".tmp";
                     try
                     {
                         if (File.Exists(file))

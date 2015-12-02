@@ -43,7 +43,7 @@ namespace Proxy.Encoding
 
             if (!string.IsNullOrEmpty(eTag))
             {
-                var file = Path.Combine(folder, eTag);
+                var file = Path.Combine(folder, eTag) + ".$$$";
                 if (File.Exists(file))
                 {                    
                     requestAsyncResult.ResponseBody = new PlainEncodingResponseBody 
@@ -89,8 +89,11 @@ namespace Proxy.Encoding
                         var memoryStream = new MemoryStream();
                         response.GetResponseStream().CopyTo(memoryStream);
                         var data = _encoder.Decode<PlainEncodingResponseBody>(memoryStream.ToArray());
+                        //Debug.Write(data != null ? System.Text.Encoding.ASCII.GetString(data.PlainBody) : string.Empty);
+                        if (data.Position != position)
+                            throw new IOException(string.Format("Bad position: {0} instead of {1}", data.Position, position));
 
-                        if (position == 0 && blockSize != data.PlainBody.Length)
+                        if (position == 0 && blockSize != data.PlainBody.Length && !string.IsNullOrEmpty(eTag))
                         {
                             try
                             {
@@ -114,7 +117,7 @@ namespace Proxy.Encoding
                             });
                         }
 
-                        return data.PlainBody;
+                        return data != null ? data.PlainBody : new byte[0];
                     })
                 )
             };

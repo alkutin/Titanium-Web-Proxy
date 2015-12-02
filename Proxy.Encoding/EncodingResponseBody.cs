@@ -19,6 +19,7 @@ namespace Proxy.Encoding
 
         public PlainEncodingResponseBody() : base() { }
 
+        public int Position;
         public byte[] PlainBody;
 
         public override Stream GetBody()

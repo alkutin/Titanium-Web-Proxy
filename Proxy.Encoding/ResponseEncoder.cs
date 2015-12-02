@@ -84,9 +84,10 @@ namespace Proxy.Encoding
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
-        {
+        {            
             //_requestBodyTask.Wait();
-            _encodingAsyncResult.WaitForHeader();
+            if (_encodingAsyncResult != null)
+                _encodingAsyncResult.WaitForHeader();
                                         
             if (onReceivedResponse != null)
             {
@@ -96,7 +97,8 @@ namespace Proxy.Encoding
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
         {
-            _encodingAsyncResult.WaitForBody();
+            if (_encodingAsyncResult != null)
+                _encodingAsyncResult.WaitForBody();
 
             if (onReceiveBody != null)
             {

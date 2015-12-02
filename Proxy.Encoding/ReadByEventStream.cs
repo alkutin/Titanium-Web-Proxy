@@ -58,10 +58,11 @@ namespace Proxy.Encoding
 
         public override int Read(byte[] buffer, int offset, int count)
         {
-            var data = _onRead(Position, count);
-            _position += data.Length;
-            Array.Copy(data, 0, buffer, offset, data.Length);
-            return data.Length;
+            var data = _onRead(Position, count);            
+            var blockSize = Math.Min(data.Length, buffer.Length - offset);
+            _position += blockSize;
+            Array.Copy(data, 0, buffer, offset, blockSize);
+            return blockSize;
         }
 
         public override long Seek(long offset, SeekOrigin origin)
