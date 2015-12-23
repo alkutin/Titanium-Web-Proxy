@@ -92,10 +92,15 @@ namespace RemoteProxySite.Handlers
                     info.AsyncResult.WaitForBody();
                     if (position == 0 && size == 0)
                     {
+                        Debug.WriteLine("Requested whole body for " +
+                            info.RequestHeader.RequestUri.AbsoluteUri);
                         eBody = info.ResponseBody.CreatePlain();
                     }
                     else
                     {
+                        Debug.WriteLine("Requested partial body for {0} at {1} size {2}",
+                            info.RequestHeader.RequestUri.AbsoluteUri,
+                            position, size);
                         var bodyStream = info.ResponseBody.GetBody();
                         if (bodyStream.Position != position)
                         {
