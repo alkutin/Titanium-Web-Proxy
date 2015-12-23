@@ -61,7 +61,7 @@ namespace RemoteProxySite.Controllers
                 info.ResponseHeader = responseHeaders;
                 encoder.ReceiveResponseBodyAsync(info.AsyncResult, (responseBody) =>
                 {
-                    info.ResponseBody = responseBody;                    
+                    info.ResponseBody = (TwoWayEncodingResponseBody)responseBody;                    
                 });
             });
 

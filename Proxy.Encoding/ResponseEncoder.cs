@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using EndPointProxy;
+using EndPointProxy.TwoWay;
 using ProxyLanguage;
 using ProxyLanguage.Models;
 
@@ -67,10 +68,17 @@ namespace Proxy.Encoding
                             ETag = _proxyResponse.GetResponseHeader("ETag")
                         };
 
-                        var memStream = new MemoryStream();
-                        _proxyResponse.GetResponseStream().CopyToAsync(memStream).ContinueWith(w =>
+
+                        var storeStream = new TwoWayStoreStream();
+                        var writeStream = new TwoWayProxyStream(storeStream);
+                        var readStream = new TwoWayProxyStream(storeStream);
+                        //var memStream = new MemoryStream();
+                        var body = new TwoWayEncodingResponseBody { BodyStream = readStream };
+                        _encodingAsyncResult.ResponseBody = body;
+                        _proxyResponse.GetResponseStream().CopyToAsync(writeStream).ContinueWith(w =>
                         {
-                            _encodingAsyncResult.ResponseBody = new PlainEncodingResponseBody { PlainBody = memStream.ToArray() };
+                            body.WriteDone = true;
+                            //_encodingAsyncResult.ResponseBody = new PlainEncodingResponseBody { PlainBody = memStream.ToArray() };
 
                         });
                     });

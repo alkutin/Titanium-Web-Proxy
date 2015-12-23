@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 
 namespace Proxy.Encoding
 {
@@ -28,6 +29,46 @@ namespace Proxy.Encoding
                 _bodyStream = new MemoryStream(PlainBody);
 
             return _bodyStream;
+        }
+    }
+
+    public class TwoWayEncodingResponseBody : EncodingResponseBody
+    {
+        private MemoryStream _bodyStream;
+        
+        public TwoWayEncodingResponseBody() : base() { }
+
+        public int Position;
+        public bool WriteDone { get; set; }
+        
+        public Stream BodyStream { get; set; }
+
+        public override Stream GetBody()
+        {
+            return BodyStream;
+        }
+
+        public PlainEncodingResponseBody CreatePlain()
+        {
+            var memStream = new MemoryStream(); 
+            
+            WaitForWriteDone();
+            BodyStream.CopyTo(memStream);
+            
+            var rez = new PlainEncodingResponseBody
+            {
+                Position = Position,
+                PlainBody = memStream.ToArray()
+            };
+            return rez;
+        }
+
+        private void WaitForWriteDone()
+        {
+            while (!WriteDone)
+            {
+                Thread.Sleep(50);
+            }
         }
     }
 

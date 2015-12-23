@@ -13,6 +13,6 @@ namespace RemoteProxySite.Models
         public EncodingRequestHeader RequestHeader;
         public EncodingRequestBody RequestBody;
         public EncodingResponseHeader ResponseHeader;
-        public EncodingResponseBody ResponseBody;
+        public TwoWayEncodingResponseBody ResponseBody;
     }
 }
