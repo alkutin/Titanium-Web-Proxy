@@ -12,6 +12,7 @@ using Proxy.Encoding;
 using RemoteProxySite.Models;
 using ProxyLanguage.Models;
 using System.Globalization;
+using System.Threading;
 
 namespace RemoteProxySite.Handlers
 {
@@ -91,10 +92,15 @@ namespace RemoteProxySite.Handlers
                     info.AsyncResult.WaitForBody();
                     if (position == 0 && size == 0)
                     {
-                        eBody = info.ResponseBody;
+                        Debug.WriteLine("Requested whole body for " +
+                            info.RequestHeader.RequestUri.AbsoluteUri);
+                        eBody = info.ResponseBody.CreatePlain();
                     }
                     else
                     {
+                        Debug.WriteLine("Requested partial body for {0} at {1} size {2}",
+                            info.RequestHeader.RequestUri.AbsoluteUri,
+                            position, size);
                         var bodyStream = info.ResponseBody.GetBody();
                         if (bodyStream.Position != position)
                         {
@@ -104,7 +110,20 @@ namespace RemoteProxySite.Handlers
                         }
                         readPosition = position;
                         var buffer = new byte[size];
-                        var readSize = bodyStream.Read(buffer, 0, size);
+                        var readComplete = false;
+                        int readSize = 0;
+                        while (!readComplete)
+                        {
+                            var oldPosition = bodyStream.Position;
+                            readSize = bodyStream.Read(buffer, 0, size);
+                            if (readSize == size || info.ResponseBody.WriteDone)
+                                readComplete = true;
+                            else
+                            {
+                                Thread.Sleep(50);
+                                bodyStream.Position = oldPosition;
+                            }
+                        }
                         var readBuffer = readSize != size ? new byte[readSize] : buffer;
                         if (readSize != size)
                             Array.Copy(buffer, 0, readBuffer, 0, readSize);
@@ -162,10 +181,13 @@ namespace RemoteProxySite.Handlers
                     {
                         if (File.Exists(file))
                         {
-                            var body = new PlainEncodingResponseBody { PlainBody = File.ReadAllBytes(file) };
+                            var body = new TwoWayEncodingResponseBody 
+                                { WriteDone = true, 
+                                    BodyStream = new MemoryStream(File.ReadAllBytes(file)) };
                             info.ResponseBody = body;
-                            info.ResponseHeader.ETag = body.PlainBody.GetMD5();
-                            info.ResponseHeader.ResponseHeaders.SetHeader("Content-Length", body.PlainBody.Length.ToString());
+                            var plainBody = body.CreatePlain();
+                            info.ResponseHeader.ETag = plainBody.PlainBody.GetMD5();
+                            info.ResponseHeader.ResponseHeaders.SetHeader("Content-Length", plainBody.PlainBody.Length.ToString());
                         }
                     }
                     catch (Exception error)
@@ -178,7 +200,7 @@ namespace RemoteProxySite.Handlers
                     encoder.ReceiveResponseBodyAsync(info.AsyncResult, (responseBody) =>
                     {
                         //info.ResponseHeader.ETag = responseBody.PlainBody.GetMD5();
-                        info.ResponseBody = responseBody;
+                        info.ResponseBody = (TwoWayEncodingResponseBody)responseBody;
                         
                         try
                         {
