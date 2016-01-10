@@ -64,7 +64,10 @@ namespace Proxy.Encoding
                             HttpDescription = _proxyResponse.StatusDescription,
                             ContentEncoding = _proxyResponse.ContentEncoding,
                             HasBody = contentLength != 0 || _proxyResponse.StatusCode != System.Net.HttpStatusCode.Created,
-                            ResponseHeaders = _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList(),
+                            ResponseHeaders = 
+                                _proxyResponse.Headers != null ?
+                                _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList()
+                                : new List<HttpHeader>(),
                             ETag = _proxyResponse.GetResponseHeader("ETag")
                         };
 

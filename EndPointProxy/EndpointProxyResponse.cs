@@ -25,7 +25,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _proxyResponse.ContentEncoding;
+                return _proxyResponse != null ? _proxyResponse.ContentEncoding : string.Empty;
             }
         }
 
@@ -43,7 +43,7 @@ namespace EndPointProxy
         {
             get
             {
-                return _proxyResponse.ProtocolVersion;
+                return _proxyResponse != null ? _proxyResponse.ProtocolVersion : new Version(1, 0);
             }
         }
 
@@ -71,7 +71,7 @@ namespace EndPointProxy
 
         public Encoding GetEncoding()
         {
-            return _proxyResponse.GetEncoding();
+            return _proxyResponse != null ? _proxyResponse.GetEncoding() : Encoding.ASCII;
         }
 
         public string GetResponseHeader(string name)
@@ -90,7 +90,8 @@ namespace EndPointProxy
 
         public Stream GetResponseStream()
         {
-            return new EndpointProxyStream(_proxyResponse.GetResponseStream());
+            return _proxyResponse != null ? (Stream)new EndpointProxyStream(_proxyResponse.GetResponseStream()) : 
+                new MemoryStream();
         }
     }
 }

@@ -182,16 +182,22 @@ namespace Titanium.Web.Proxy
                 var buffer = new byte[BUFFER_SIZE];
 
                 int bytesRead;
-                using (var memoryStream = new MemoryStream())
+                bool readBytesExists = true;
+                while (readBytesExists)
                 {
-                    while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0)
+                    using (var memoryStream = new MemoryStream())
                     {
-                        memoryStream.Write(buffer, 0, bytesRead);
-                    }
+                        while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0 
+                            && memoryStream.Length < 65536)
+                        {
+                            memoryStream.Write(buffer, 0, bytesRead);
+                        }
 
-                    Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
-                    outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
-                }                
+                        readBytesExists = bytesRead != 0;
+                        //Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
+                        outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
+                    }
+                }
             }
             else
                 WriteResponseBodyChunked(inStream, outStream);
