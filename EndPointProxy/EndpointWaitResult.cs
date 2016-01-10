@@ -103,7 +103,7 @@ namespace EndPointProxy
 
         #region IDisposable Support
         private bool disposedValue = false; // To detect redundant calls
-        private const int WaitTimeoutMSecs = 60000;
+        private const int WaitTimeoutMSecs = 90000;
 
         protected virtual void Dispose(bool disposing)
         {

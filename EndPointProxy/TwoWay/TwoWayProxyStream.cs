@@ -12,10 +12,14 @@ namespace EndPointProxy.TwoWay
         private TwoWayStoreStream _storeStream;
         private long _position;
 
+        public event EventHandler Closed;
+
         public TwoWayProxyStream(TwoWayStoreStream storeStream)
         {
             _storeStream = storeStream;
         }
+
+        public TwoWayStoreStream StoreStream { get { return _storeStream; } }
 
         public override bool CanRead
         {

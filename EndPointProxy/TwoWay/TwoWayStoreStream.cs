@@ -13,7 +13,7 @@ namespace EndPointProxy.TwoWay
         private MemoryStream _store = new MemoryStream();
 
         public object Lock { get { return _lock; } }
-        public Stream Store { get { return _store; } }
+        public MemoryStream Store { get { return _store; } }
 
         public override bool CanRead
         {
