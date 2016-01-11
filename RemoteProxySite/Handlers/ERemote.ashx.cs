@@ -13,6 +13,7 @@ using RemoteProxySite.Models;
 using ProxyLanguage.Models;
 using System.Globalization;
 using System.Threading;
+using EndPointProxy.TwoWay;
 
 namespace RemoteProxySite.Handlers
 {
@@ -28,6 +29,11 @@ namespace RemoteProxySite.Handlers
         public ERemote()
         {
             _encoder = new Proxy.Encoding.Encoder(Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Key"]), Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Vector"]));
+        }
+
+        public static EncodingRequestHeader[] GetSessions()
+        {
+            return _sessions.Select(s => s.Value.RequestHeader).ToArray();
         }
 
         public void ProcessRequest(HttpContext context)
@@ -135,13 +141,17 @@ namespace RemoteProxySite.Handlers
                         };
                     }
 
+                    info.LastAccessUTC = DateTime.UtcNow;
                     if (size == 0 || size != eBody.GetBody().Length)
-                    {
+                    {                        
                         Task.Delay(10000).ContinueWith((task) =>
                         {
-                            ((IDisposable)info.AsyncResult).Dispose();
-                            ResponseTuple removedInfo;
-                            _sessions.TryRemove(key, out removedInfo);
+                            if ((DateTime.UtcNow - info.LastAccessUTC).TotalSeconds >= 10)
+                            {
+                                ((IDisposable)info.AsyncResult).Dispose();
+                                ResponseTuple removedInfo;
+                                _sessions.TryRemove(key, out removedInfo);
+                            }
                         });
                     }
                 }
@@ -204,7 +214,19 @@ namespace RemoteProxySite.Handlers
                         
                         try
                         {
-                            if (!string.IsNullOrEmpty(file) && responseBody.GetBody() is MemoryStream)
+                            var remoteBody = responseBody.GetBody();
+                            if (remoteBody is TwoWayProxyStream && !string.IsNullOrEmpty(file))
+                            {
+                                var twoWayStream = (TwoWayProxyStream)remoteBody;
+                                twoWayStream.Closed += (sender, args) =>
+                                {
+                                    var folder = Path.GetDirectoryName(file);
+                                    if (!Directory.Exists(folder))
+                                        Directory.CreateDirectory(folder);
+                                    File.WriteAllBytes(file, twoWayStream.StoreStream.Store.ToArray());
+                                };
+                            }
+                            if (!string.IsNullOrEmpty(file) && remoteBody is MemoryStream)
                             {
                                 var folder = Path.GetDirectoryName(file);
                                 if (!Directory.Exists(folder))

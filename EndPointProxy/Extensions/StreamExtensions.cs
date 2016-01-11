@@ -6,7 +6,7 @@ namespace EndPointProxy.Extensions
 {
     public static class StreamHelper
     {
-        private static int WaitTimeoutMSecs = 600000;
+        private static int WaitTimeoutMSecs = 900000;
 
         public static void CopyToAsync(this Stream input, string initialData, Stream output, int bufferSize)
         {

@@ -14,5 +14,6 @@ namespace RemoteProxySite.Models
         public EncodingRequestBody RequestBody;
         public EncodingResponseHeader ResponseHeader;
         public TwoWayEncodingResponseBody ResponseBody;
+        public DateTime LastAccessUTC;
     }
 }

@@ -12,15 +12,15 @@
     "ad.rambler.ru",
     "ads.adfox.ru",
     "getclicky.com",
-    "adriver.com",
+    adriver.com",
 	"popads.net",
 	"adnetworkperfomance.com",
 	"www.adnetworkperfomance.com",
 	"vulkan.site",
 	"c.mgid.com",
 	"ready4win.com",
-	"whos.amung.us"
-  ],
+	"whos.amung.us",
+	"c.mgid.com",	"ff.kis.scr.kaspersky-labs.com"  ],
   "proxy": {
 	"John's Background Switcher 4.10 (http://www.backgroundswitcher.com/)": [],
     "Mozilla/5.0 (Windows NT 6.1; WOW64; rv:39.0) Gecko/20100101 Firefox/39.0": [],

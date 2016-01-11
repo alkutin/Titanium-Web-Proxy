@@ -66,7 +66,7 @@ namespace Proxy.Encoding
         {
             using (var encryption = AesCryptoServiceProvider.Create())
             {
-                Debug.WriteLine("Current block size: " + encryption.BlockSize.ToString());
+                //Debug.WriteLine("Current block size: " + encryption.BlockSize.ToString());
                 encryption.BlockSize = DefaultBlockSize;
                 encryption.Key = _key;
                 encryption.IV = _iv;
