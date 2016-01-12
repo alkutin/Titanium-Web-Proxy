@@ -21,7 +21,7 @@ namespace Titanium.Web.Proxy
     /// </summary>
     public partial class ProxyServer
     {
-        private static readonly int BUFFER_SIZE = 8192;
+        private static readonly int BUFFER_SIZE = 8192 * 4;
         
         private static readonly string[] ColonSpaceSplit = { ": " };
         private static readonly char[] SpaceSplit = { ' ' };

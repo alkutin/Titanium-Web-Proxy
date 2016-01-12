@@ -19,9 +19,11 @@ namespace Titanium.Web.Proxy
         //Called asynchronously when a request was successfully and we received the response
         private static void HandleHttpSessionResponse(IAsyncResult asynchronousResult)
         {
-            var args = (SessionEventArgs)asynchronousResult.AsyncState;
+            var args = asynchronousResult != null ? (SessionEventArgs)asynchronousResult.AsyncState
+                : new SessionEventArgs(0) { };
 
-            args.ServerResponse = args.ProxyRequest.EndGetResponse(asynchronousResult);
+            args.ServerResponse = args.ProxyRequest != null 
+                ? args.ProxyRequest.EndGetResponse(asynchronousResult) : null;
             
             try
             {
@@ -188,14 +190,15 @@ namespace Titanium.Web.Proxy
                     using (var memoryStream = new MemoryStream())
                     {
                         while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0 
-                            && memoryStream.Length < 65536)
+                            && memoryStream.Length < 65536 * 4)
                         {
                             memoryStream.Write(buffer, 0, bytesRead);
                         }
 
-                        readBytesExists = bytesRead != 0;
+                        readBytesExists = bytesRead > 0;
                         //Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
-                        outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
+                        if (readBytesExists)
+                            outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
                     }
                 }
             }
