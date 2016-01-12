@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 using EndPointProxy;
 using EndPointProxy.TwoWay;
@@ -76,14 +77,20 @@ namespace Proxy.Encoding
                         var writeStream = new TwoWayProxyStream(storeStream);
                         var readStream = new TwoWayProxyStream(storeStream);
                         //var memStream = new MemoryStream();
-                        var body = new TwoWayEncodingResponseBody { BodyStream = readStream };
-                        _encodingAsyncResult.ResponseBody = body;
+                        var body = new TwoWayEncodingResponseBody { BodyStream = readStream };                        
                         _proxyResponse.GetResponseStream().CopyToAsync(writeStream).ContinueWith(w =>
                         {
                             body.WriteDone = true;
                             //_encodingAsyncResult.ResponseBody = new PlainEncodingResponseBody { PlainBody = memStream.ToArray() };
 
                         });
+
+                        for (var iWait = 0; iWait < 10; iWait++)
+                            if (readStream.Length > 0)
+                                break;
+                            else Thread.Sleep(100);
+                        
+                        _encodingAsyncResult.ResponseBody = body;
                     });
                     
                 }, this);
