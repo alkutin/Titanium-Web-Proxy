@@ -2,6 +2,7 @@
 using System.Configuration;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
+using System.Threading.Tasks;
 
 namespace Titanium.Web.Proxy.Test
 {
@@ -21,6 +22,8 @@ namespace Titanium.Web.Proxy.Test
 
             Controller.SetAsSystemProxy = bool.Parse(ConfigurationManager.AppSettings["SystemProxy"]);
             Console.WriteLine("Set this as a System Proxy: {0}", Controller.SetAsSystemProxy);
+
+            Console.WriteLine("Maximum Concurrency level: {0}", TaskScheduler.Current.MaximumConcurrencyLevel);
 
             //Start proxy controller
             Controller.StartProxy();

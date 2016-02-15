@@ -1,4 +1,5 @@
 ﻿using EndPointProxy.Extensions;
+using EndPointProxy.TwoWay;
 using ProxyLanguage;
 using ProxyLanguage.Models;
 using System;
@@ -9,6 +10,7 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using System.Text;
+using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Helpers;
 
@@ -75,7 +77,10 @@ namespace Titanium.Web.Proxy
                         WriteResponseBody(args.ResponseStream, args.ClientStream, isChunked);
                     }
 
-                    args.ClientStream.Flush();
+                    if (string.IsNullOrEmpty(args.ResponseHeaders.GetHeader("content-length")))
+                        Dispose(args.Client, args.ClientStream, args.ClientStreamReader, args.ClientStreamWriter, args);
+                    else
+                        args.ClientStream.Flush();
                 }
             }
             catch(Exception error)
@@ -181,6 +186,21 @@ namespace Titanium.Web.Proxy
         {
             if (!isChunked)
             {
+
+                /*
+                using (var store = new TwoWayStoreStream())
+                {
+                    using (var reader = new TwoWayProxyStream(store))
+                    {                        
+                        using (var writer = new TwoWayProxyStream(store))
+                        {
+                            var readTask = inStream.CopyToAsync(reader);
+                            var writeTask = writer.CopyToAsync(outStream);
+                            readTask.Wait();
+                            writeTask.Wait();
+                        }                        
+                    }
+                }                      */
                 var buffer = new byte[BUFFER_SIZE];
 
                 int bytesRead;
@@ -190,17 +210,17 @@ namespace Titanium.Web.Proxy
                     using (var memoryStream = new MemoryStream())
                     {
                         while ((bytesRead = inStream.Read(buffer, 0, buffer.Length)) > 0 
-                            && memoryStream.Length < 65536 * 4)
+                            /*&& memoryStream.Length < 65536 * 4*/)
                         {
                             memoryStream.Write(buffer, 0, bytesRead);
                         }
 
                         readBytesExists = bytesRead > 0;
                         //Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
-                        if (readBytesExists)
+                        if (memoryStream.Length > 0)
                             outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);
                     }
-                }
+                } 
             }
             else
                 WriteResponseBodyChunked(inStream, outStream);

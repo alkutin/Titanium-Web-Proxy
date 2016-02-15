@@ -132,13 +132,17 @@ namespace Proxy.Filters
                     };
             }
 
+            var oldColor = Console.ForegroundColor;
             if (_enableSelectiveProxy)
             {
                 //Console.WriteLine(request.Key.RequestUri.Host);
+                var agentFound = false;
+                var userAgent = request.Key.RequestHeaders.GetHeader("User-Agent");
                 foreach (var agent in _config.Proxy)
                 {                    
-                    if (agent.Key.Equals(request.Key.RequestHeaders.GetHeader("User-Agent")))
+                    if (agent.Key.Equals(userAgent))
                     {
+                        agentFound = true;
                         if (agent.Value.Length == 0 
                             || agent.Value.Any(w => w.StartsWith(@".") ? ("." + request.Key.RequestUri.Host).EndsWith(w) : w.Equals(request.Key.RequestUri.Host)))
                         {
@@ -148,10 +152,16 @@ namespace Proxy.Filters
                     }
                 }
 
+                if (!agentFound)
+                {
+                    Console.ForegroundColor = ConsoleColor.Red;
+                    Console.WriteLine("Unknown User Agent: " + userAgent);
+                    Console.ForegroundColor = oldColor;
+                }
+
             }
             else _current = _next;
-
-            var oldColor = Console.ForegroundColor;
+            
             Console.ForegroundColor = ConsoleColor.Yellow;
             if (_current == _next)
                 Console.WriteLine("Next: " + request.Key.RequestUri.Host);
