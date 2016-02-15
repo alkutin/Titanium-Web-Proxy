@@ -74,7 +74,9 @@ namespace Titanium.Web.Proxy
                         WriteResponseStatus(args.ServerResponse.ProtocolVersion, args.ServerResponse.StatusCode,
                             args.ServerResponse.StatusDescription, args.ClientStreamWriter);
                         WriteResponseHeaders(args.ClientStreamWriter, args.ResponseHeaders, true);// isChunked || !string.IsNullOrEmpty(args.ServerResponse.GetResponseHeader("content-length")));
-                        WriteResponseBody(args.ResponseStream, args.ClientStream, isChunked);
+                        var sContentLength = args.ResponseHeaders.GetHeader("content-length");
+                        WriteResponseBody(string.IsNullOrEmpty(sContentLength) ? -1 : long.Parse(sContentLength),
+                            args.ResponseStream, args.ClientStream, isChunked);
                     }
 
                     if (string.IsNullOrEmpty(args.ResponseHeaders.GetHeader("content-length")))
@@ -182,7 +184,7 @@ namespace Titanium.Web.Proxy
                 WriteResponseBodyChunked(data, clientStream);
         }
 
-        private static void WriteResponseBody(Stream inStream, Stream outStream, bool isChunked)
+        private static void WriteResponseBody(long knownContentLength, Stream inStream, Stream outStream, bool isChunked)
         {
             if (!isChunked)
             {
@@ -204,7 +206,9 @@ namespace Titanium.Web.Proxy
                 var buffer = new byte[BUFFER_SIZE];
 
                 int bytesRead;
+                long bytesToRead = knownContentLength;
                 bool readBytesExists = true;
+                var tryCount = 0;
                 while (readBytesExists)
                 {
                     using (var memoryStream = new MemoryStream())
@@ -215,7 +219,9 @@ namespace Titanium.Web.Proxy
                             memoryStream.Write(buffer, 0, bytesRead);
                         }
 
-                        readBytesExists = bytesRead > 0;
+                        if (bytesToRead == 0)
+                            tryCount++;
+                        readBytesExists = knownContentLength == -1 ? bytesRead > 0 : knownContentLength > 0 && tryCount < 10;
                         //Debug.WriteLine("Output stream length: " + memoryStream.Length.ToString());
                         if (memoryStream.Length > 0)
                             outStream.Write(memoryStream.ToArray(), 0, (int)memoryStream.Length);

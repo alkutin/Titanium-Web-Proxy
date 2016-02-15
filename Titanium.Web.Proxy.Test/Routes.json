@@ -22,8 +22,8 @@
 	"c.mgid.com",
 	"ready4win.com",
 	"whos.amung.us",
-	"c.mgid.com",	"ff.kis.scr.kaspersky-labs.com",
-	"192.168.110.10" ],
+	"c.mgid.com",	"ff.kis.scr.kaspersky-labs.com", 
+	"192.168.110.10"  ],
   "proxy": {
 	"Mozilla/5.0": [],
     "Windows Xamarin Studio": [ ],
