@@ -23,16 +23,16 @@ namespace Proxy.Encoding
         private EncodingAsyncResult _encodingAsyncResult;
 
         public ResponseEncoder()
-        {            
+        {
         }
 
         public IEncodedAsyncResult SendRequestAsync(KeyValuePair<EncodingRequestHeader, EncodingRequestBody> request, Action<IEncodedAsyncResult> onComplete)
         {
             _requestHeaders = request.Key;
             _requestBody = request.Value;
-            _proxyRequest = new EndPointProxyRequest(_requestHeaders.RequestUri, _requestHeaders.HttpMethod, Version.Parse(_requestHeaders.Version));
+            _proxyRequest = new EndPointProxyRequest(new Uri( _requestHeaders.RequestUri), _requestHeaders.HttpMethod, Version.Parse(_requestHeaders.Version));
             _proxyRequest.SetRequestHeaders(_requestHeaders.RequestHeaders);
-            
+
             _encodingAsyncResult = new EncodingAsyncResult()
             {
                 Key = Guid.NewGuid(),
@@ -65,7 +65,7 @@ namespace Proxy.Encoding
                             HttpDescription = _proxyResponse.StatusDescription,
                             ContentEncoding = _proxyResponse.ContentEncoding,
                             HasBody = contentLength != 0 || _proxyResponse.StatusCode != System.Net.HttpStatusCode.Created,
-                            ResponseHeaders = 
+                            ResponseHeaders =
                                 _proxyResponse.Headers != null ?
                                 _proxyResponse.Headers.Select(s => new HttpHeader(s.Key, s.Value)).ToList()
                                 : new List<HttpHeader>(),
@@ -77,7 +77,7 @@ namespace Proxy.Encoding
                         var writeStream = new TwoWayProxyStream(storeStream);
                         var readStream = new TwoWayProxyStream(storeStream);
                         //var memStream = new MemoryStream();
-                        var body = new TwoWayEncodingResponseBody { BodyStream = readStream };                        
+                        var body = new TwoWayEncodingResponseBody { BodyStream = readStream };
                         _proxyResponse.GetResponseStream().CopyToAsync(writeStream).ContinueWith(w =>
                         {
                             body.WriteDone = true;
@@ -89,24 +89,24 @@ namespace Proxy.Encoding
                             if (readStream.Length > 0)
                                 break;
                             else Thread.Sleep(100);
-                        
+
                         _encodingAsyncResult.ResponseBody = body;
                     });
-                    
+
                 }, this);
             });
-            
 
-            
+
+
             return _encodingAsyncResult;
         }
 
         public void ReceiveResponseHeaderAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseHeader> onReceivedResponse)
-        {            
+        {
             //_requestBodyTask.Wait();
             if (_encodingAsyncResult != null)
                 _encodingAsyncResult.WaitForHeader();
-                                        
+
             if (onReceivedResponse != null)
             {
                 onReceivedResponse(requestAsyncResult.ResponseHeaders);

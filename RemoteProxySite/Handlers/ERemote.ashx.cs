@@ -9,33 +9,34 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Web.Http;
 using Proxy.Encoding;
-using RemoteProxySite.Models;
 using ProxyLanguage.Models;
 using System.Globalization;
 using System.Threading;
 using EndPointProxy.TwoWay;
+using ERemoteProxy.ServiceLibrary.Models;
 
 namespace RemoteProxySite.Handlers
 {
     /// <summary>
     /// Summary description for ERemote
     /// </summary>
-    public class ERemote : IHttpHandler
+    public class ERemote : ERemoteProxy.ServiceLibrary.ERemoteHandler, IHttpHandler
     {
-        private static System.Collections.Concurrent.ConcurrentDictionary<Guid, ResponseTuple> _sessions =
+        /*private static System.Collections.Concurrent.ConcurrentDictionary<Guid, ResponseTuple> _sessions =
             new System.Collections.Concurrent.ConcurrentDictionary<Guid, ResponseTuple>();
-        private Proxy.Encoding.Encoder _encoder;
+        private Proxy.Encoding.Encoder _encoder;                 */
 
-        public ERemote()
+        /*public ERemote() : base()
         {
             _encoder = new Proxy.Encoding.Encoder(Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Key"]), Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Vector"]));
-        }
+        }   */
 
+        /*
         public static EncodingRequestHeader[] GetSessions()
         {
             return _sessions.Select(s => s.Value.RequestHeader).ToArray();
         }
-
+                     */
         public void ProcessRequest(HttpContext context)
         {
             try
@@ -51,22 +52,22 @@ namespace RemoteProxySite.Handlers
                     var position = int.Parse(context.Request.Params["P"]);
                     var size = int.Parse(context.Request.Params["S"]);
                     var buffer = Get(key, body, position, size);
-                    
+
                     context.Response.BinaryWrite(buffer);
-                } 
+                }
                 else if (context.Request.HttpMethod == "POST")
                 {
                     var stream = new MemoryStream();
                     context.Request.GetBufferedInputStream().CopyTo(stream);
                     context.Response.BinaryWrite(Post(stream.ToArray()));
-                } 
+                }
                 else if (context.Request.HttpMethod == "DELETE")
                 {
                     var key = Guid.Parse(context.Request.Params["key"]);
                     Delete(key);
                     context.Response.Write("Deleted");
                 }
-                else                 
+                else
                     throw new ArgumentOutOfRangeException("Unknown HTTP Method: " + context.Request.HttpMethod);
             }
             catch (Exception errorException)
@@ -86,6 +87,7 @@ namespace RemoteProxySite.Handlers
             }
         }
 
+        /*
         public byte[] Get(Guid key, bool body, int position, int size)
         {
             ResponseTuple info;
@@ -143,7 +145,7 @@ namespace RemoteProxySite.Handlers
 
                     info.LastAccessUTC = DateTime.UtcNow;
                     if (size == 0 || size != eBody.GetBody().Length)
-                    {                        
+                    {
                         Task.Delay(10000).ContinueWith((task) =>
                         {
                             if ((DateTime.UtcNow - info.LastAccessUTC).TotalSeconds >= 10)
@@ -181,7 +183,7 @@ namespace RemoteProxySite.Handlers
             encoder.ReceiveResponseHeaderAsync(info.AsyncResult, (responseHeaders) =>
             {
                 info.ResponseHeader = responseHeaders;
-                var file = string.Empty;                
+                var file = string.Empty;
 
                 if (!string.IsNullOrEmpty(responseHeaders.ETag))
                 {
@@ -191,8 +193,8 @@ namespace RemoteProxySite.Handlers
                     {
                         if (File.Exists(file))
                         {
-                            var body = new TwoWayEncodingResponseBody 
-                                { WriteDone = true, 
+                            var body = new TwoWayEncodingResponseBody
+                                { WriteDone = true,
                                     BodyStream = new MemoryStream(File.ReadAllBytes(file)) };
                             info.ResponseBody = body;
                             var plainBody = body.CreatePlain();
@@ -211,7 +213,7 @@ namespace RemoteProxySite.Handlers
                     {
                         //info.ResponseHeader.ETag = responseBody.PlainBody.GetMD5();
                         info.ResponseBody = (TwoWayEncodingResponseBody)responseBody;
-                        
+
                         try
                         {
                             var remoteBody = responseBody.GetBody();
@@ -253,5 +255,6 @@ namespace RemoteProxySite.Handlers
                 ((IDisposable)removedInfo.AsyncResult).Dispose();
             }
         }
+        */
     }
 }

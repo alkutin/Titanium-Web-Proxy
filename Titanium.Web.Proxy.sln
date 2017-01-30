@@ -1,7 +1,7 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 14
-VisualStudioVersion = 14.0.23107.0
+VisualStudioVersion = 14.0.25420.1
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{B6DBABDC-C985-4872-9C38-B4E5079CBC4B}"
 EndProject
@@ -29,6 +29,10 @@ EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RemoteProxySite.Tests", "RemoteProxySite.Tests\RemoteProxySite.Tests.csproj", "{7064408A-E04B-44F8-9B04-BA21CEE4DF7C}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Proxy.Filters", "Proxy.Filters\Proxy.Filters.csproj", "{BD91E775-F879-4B0A-B2AD-6351588F1A77}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ERemoteProxy.ServiceLibrary", "ERemoteProxy.ServiceLibrary\ERemoteProxy.ServiceLibrary.csproj", "{3EAD0E02-2DE0-4117-8501-A6C8F4462147}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AndroidPoxyApp", "AndroidPoxyApp\AndroidPoxyApp.csproj", "{B35758CB-1E6F-4430-BEFA-B82FECA32830}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -136,6 +140,36 @@ Global
 		{BD91E775-F879-4B0A-B2AD-6351588F1A77}.Release|x64.Build.0 = Release|Any CPU
 		{BD91E775-F879-4B0A-B2AD-6351588F1A77}.Release|x86.ActiveCfg = Release|Any CPU
 		{BD91E775-F879-4B0A-B2AD-6351588F1A77}.Release|x86.Build.0 = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|x64.Build.0 = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Debug|x86.Build.0 = Debug|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|x64.ActiveCfg = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|x64.Build.0 = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|x86.ActiveCfg = Release|Any CPU
+		{3EAD0E02-2DE0-4117-8501-A6C8F4462147}.Release|x86.Build.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|Any CPU.Deploy.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x64.Build.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x64.Deploy.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x86.Build.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Debug|x86.Deploy.0 = Debug|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x64.ActiveCfg = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x64.Build.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x64.Deploy.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x86.ActiveCfg = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x86.Build.0 = Release|Any CPU
+		{B35758CB-1E6F-4430-BEFA-B82FECA32830}.Release|x86.Deploy.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

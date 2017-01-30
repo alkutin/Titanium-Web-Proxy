@@ -31,9 +31,21 @@ namespace Titanium.Web.Proxy
             {
                 if (args.ServerResponse != null)
                 {
-                    args.ResponseHeaders = ReadResponseHeaders(args.ServerResponse);
-                    args.ResponseStream = args.ServerResponse.GetResponseStream();
 
+                    args.ResponseHeaders = ReadResponseHeaders(args.ServerResponse);
+                    var oldColor = Console.ForegroundColor;
+                    Console.ForegroundColor = args.ServerResponse.StatusCode >= HttpStatusCode.BadRequest ? ConsoleColor.Red : ConsoleColor.Green;
+                    Console.WriteLine("{0} {1}", args.RequestUrl, args.ServerResponse.StatusCode);
+
+                    try
+                    {
+                        args.ResponseStream = args.ServerResponse.GetResponseStream();                        
+                    }
+                    finally
+                    {
+                        Console.WriteLine("{0} {1}", args.RequestUrl, args.ResponseStream != null ? args.ResponseHeaders.GetHeader("content-length") + "b" : "empty");
+                        Console.ForegroundColor = oldColor;
+                    }
 
                     if (BeforeResponse != null)
                     {

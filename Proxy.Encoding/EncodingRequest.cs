@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 
 namespace Proxy.Encoding
 {
+    [Serializable]
     public class EncodingRequest
     {
         public EncodingRequestHeader Header;

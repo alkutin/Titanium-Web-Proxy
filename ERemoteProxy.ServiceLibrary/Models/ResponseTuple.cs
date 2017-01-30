@@ -1,13 +1,9 @@
-﻿using Proxy.Encoding;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System;
+using Proxy.Encoding;
 
-namespace RemoteProxySite.Models
+namespace ERemoteProxy.ServiceLibrary.Models
 {
-    class ResponseTuple
+    public class ResponseTuple
     {
         public IEncodedAsyncResult AsyncResult;
         public EncodingRequestHeader RequestHeader;

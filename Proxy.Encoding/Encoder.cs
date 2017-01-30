@@ -7,7 +7,7 @@ using System.Linq;
 using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
-using System.Web.Script.Serialization;
+using System.Xml.Serialization;
 
 namespace Proxy.Encoding
 {
@@ -30,7 +30,7 @@ namespace Proxy.Encoding
             using (var stream = new GZipStream(rezStream, CompressionMode.Compress, true))
             {
                 stream.Write(source, 0, source.Length);
-                stream.Flush();                
+                stream.Flush();
             }
 
             return rezStream.ToArray();
@@ -41,8 +41,8 @@ namespace Proxy.Encoding
             var rezStream = new MemoryStream();
 
             using (var stream = new GZipStream(new MemoryStream(source), CompressionMode.Decompress, true))
-            {                
-                stream.CopyTo(rezStream);                
+            {
+                stream.CopyTo(rezStream);
             }
 
             return rezStream.ToArray();
@@ -50,16 +50,23 @@ namespace Proxy.Encoding
 
         public byte[] Encode(object source)
         {
-            var encoder = new JavaScriptSerializer();
-            var sRez = encoder.Serialize(source);
-            return Encode(Compress(System.Text.Encoding.Unicode.GetBytes(sRez)));
+            var encoder = new XmlSerializer(source.GetType());
+            using (var stream = new MemoryStream())
+            {
+                encoder.Serialize(stream, source);
+                var sRez = stream.ToArray();// System.Text.Encoding.Unicode.GetString(stream.ToArray());
+                return Encode(Compress(sRez));// System.Text.Encoding.Unicode.GetBytes(sRez)));
+            }
         }
 
         public T Decode<T>(byte[] encoded)
         {
-            var decrypted = System.Text.Encoding.Unicode.GetString(Decompress(Decode(encoded)));
-            var encoder = new JavaScriptSerializer();
-            return encoder.Deserialize<T>(decrypted);
+            var decrypted = Decompress(Decode(encoded));//);System.Text.Encoding.Unicode.GetString(
+            using (var stream = new MemoryStream(decrypted))//StringReader
+            {
+                var encoder = new XmlSerializer(typeof(T));
+                return (T)encoder.Deserialize(stream);
+            }
         }
 
         byte[] Encode(byte[] source)

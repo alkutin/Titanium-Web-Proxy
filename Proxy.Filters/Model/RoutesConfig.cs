@@ -8,6 +8,13 @@ namespace Proxy.Filters.Model
 {
     public class RoutesConfig
     {
+        public class BluetoothConfig
+        {
+            public string Device;
+            public bool Enabled;
+        }
+
+        public BluetoothConfig Bluetooth;
         public string[] Forbiden;
         public Dictionary<string, string[]> Proxy;
     }

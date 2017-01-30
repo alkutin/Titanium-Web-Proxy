@@ -3,6 +3,7 @@ using System.Configuration;
 using System.Runtime.InteropServices;
 using System.Security.Permissions;
 using System.Threading.Tasks;
+using EndPointProxy;
 
 namespace Titanium.Web.Proxy.Test
 {
@@ -13,10 +14,11 @@ namespace Titanium.Web.Proxy.Test
         [PermissionSet(SecurityAction.Demand, Name = "FullTrust")]
         public static void Main(string[] args)
         {
+            ConfigurationSingleton.Instance = new AppSettingsConfigurationManager();
             //On Console exit make sure we also exit the proxy
             NativeMethods.Handler = ConsoleEventCallback;
             NativeMethods.SetConsoleCtrlHandler(NativeMethods.Handler, true);
-            
+
             Controller.EnableSsl = bool.Parse(ConfigurationManager.AppSettings["MonitorHTTPS"]);
             Console.WriteLine("Monitor HTTPS: {0}", Controller.EnableSsl);
 

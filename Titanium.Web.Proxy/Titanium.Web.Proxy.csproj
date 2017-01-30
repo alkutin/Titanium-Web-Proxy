@@ -90,6 +90,10 @@
       <HintPath>..\packages\Autofac.WebApi.3.1.0\lib\net40\Autofac.Integration.WebApi.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="InTheHand.Net.Personal, Version=3.5.605.0, Culture=neutral, PublicKeyToken=ea38caa273134499, processorArchitecture=MSIL">
+      <HintPath>..\packages\32feet.NET.3.5.0.0\lib\net\InTheHand.Net.Personal.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="Ionic.Zip">
       <HintPath>..\packages\DotNetZip.1.9.3\lib\net20\Ionic.Zip.dll</HintPath>
     </Reference>
@@ -104,6 +108,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AutofacSetup.cs" />
+    <Compile Include="BluetoothInvoker.cs" />
     <Compile Include="Exceptions\BodyNotFoundException.cs" />
     <Compile Include="Helpers\CertificateManager.cs" />
     <Compile Include="Helpers\Firefox.cs" />

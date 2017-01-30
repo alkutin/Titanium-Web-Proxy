@@ -24,18 +24,22 @@ namespace Proxy.Filters
         private IEncodedTransfer _skip;
 
         private IEncodedTransfer _current;
+        private IEncodedBluetoothTransfer _bluetoothNext;
 
         static RoutesFilter()
         {
-            
+
         }
 
-        public RoutesFilter(IEncodedTransfer next, IEncodedTransfer skip)
+        public RoutesFilter(IEncodedTransfer next, IEncodedBluetoothTransfer bluetoothNext, IEncodedTransfer skip)
         {
             _next = next;
+            _bluetoothNext = bluetoothNext;
             _skip = skip;
 
             _current = _skip;
+
+            _bluetoothNext.SetRemoteDevice(_config.Bluetooth.Device);
         }
 
         public static void Init()
@@ -48,7 +52,7 @@ namespace Proxy.Filters
             try
             {
                 LoadRoutesFile();
-             
+
                 _watcher = new FileSystemWatcher(Path.GetDirectoryName(_path), Path.GetFileNameWithoutExtension(_path) + ".*");
                 _watcher.Changed += RoutesFileChanged;
                 _watcher.NotifyFilter = NotifyFilters.LastWrite | NotifyFilters.Size;
@@ -111,7 +115,7 @@ namespace Proxy.Filters
             if (_enableForbiden)
             {
                 foreach (var url in _config.Forbiden)
-                    if (request.Key.RequestUri.Host == url)
+                    if (request.Key.RequestAsUri.Host == url)
                     {
                         var rez = new EncodingAsyncResult
                         {
@@ -139,14 +143,14 @@ namespace Proxy.Filters
                 var agentFound = false;
                 var userAgent = request.Key.RequestHeaders.GetHeader("User-Agent");
                 foreach (var agent in _config.Proxy)
-                {                    
+                {
                     if (agent.Key.Equals(userAgent))
                     {
                         agentFound = true;
-                        if (agent.Value.Length == 0 
-                            || agent.Value.Any(w => w.StartsWith(@".") ? ("." + request.Key.RequestUri.Host).EndsWith(w) : w.Equals(request.Key.RequestUri.Host)))
+                        if (agent.Value.Length == 0
+                            || agent.Value.Any(w => w.StartsWith(@".") ? ("." + request.Key.RequestAsUri.Host).EndsWith(w) : w.Equals(request.Key.RequestAsUri.Host)))
                         {
-                            _current = _next;                            
+                            _current = _config.Bluetooth.Enabled ? _bluetoothNext : _next;
                             break;
                         }
                     }
@@ -160,12 +164,12 @@ namespace Proxy.Filters
                 }
 
             }
-            else _current = _next;
-            
+            else _current = _config.Bluetooth.Enabled ? _bluetoothNext : _next;
+
             Console.ForegroundColor = ConsoleColor.Yellow;
-            if (_current == _next)
-                Console.WriteLine("Next: " + request.Key.RequestUri.Host);
-            else Console.WriteLine("Skip: " + request.Key.RequestUri.Host);
+            if (_current == (_config.Bluetooth.Enabled ? _bluetoothNext : _next))
+                Console.WriteLine("Next: " + request.Key.RequestAsUri.Host);
+            else Console.WriteLine("Skip: " + request.Key.RequestAsUri.Host);
             Console.ForegroundColor = oldColor;
 
             return _current.SendRequestAsync(request, onComplete);

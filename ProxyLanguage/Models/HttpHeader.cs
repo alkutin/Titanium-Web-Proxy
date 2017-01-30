@@ -8,7 +8,7 @@ namespace ProxyLanguage.Models
     {
         public HttpHeader()
         {
-            
+
         }
 
         public HttpHeader(string name, string value)

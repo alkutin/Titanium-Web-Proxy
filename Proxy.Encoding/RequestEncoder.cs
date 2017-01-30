@@ -12,7 +12,7 @@ namespace Proxy.Encoding
 {
     public class RequestEncoder : IProxyRequest
     {
-        private IEncodedTransfer _encodedTransfer;        
+        private IEncodedTransfer _encodedTransfer;
         private List<ProxyLanguage.Models.HttpHeader> _requestHeaders;
         private Uri _requestUri;
         private string _httpMethod;
@@ -28,7 +28,7 @@ namespace Proxy.Encoding
             _encodedTransfer = encodedTransfer;
             _requestUri = requestUri;
             _httpMethod = httpMethod;
-            _version = version;            
+            _version = version;
         }
 
         public Uri RequestUri
@@ -47,7 +47,7 @@ namespace Proxy.Encoding
 
         public System.Text.Encoding RequestEncoding
         {
-            get 
+            get
             {
                 var contentType = GetRequestHeader("Content-Type");
                 if (!string.IsNullOrEmpty(contentType))
@@ -95,7 +95,7 @@ namespace Proxy.Encoding
 
         public bool SendChunked
         {
-            get 
+            get
             {
                 return GetRequestHeader("Transfer-Encoding").ToLower().Contains("chunked");
             }
@@ -120,22 +120,22 @@ namespace Proxy.Encoding
         public IAsyncResult BeginGetResponse(AsyncCallback asyncResult, object args)
         {
             var dataToSend = new EncodingRequestHeader
-            { 
+            {
                 HttpMethod = _httpMethod,
-                RequestUri = _requestUri,
+                RequestUri = _requestUri.ToString(),
                 Version = _version.ToString(),
                 RequestHeaders = _requestHeaders
             };
-            
+
             _asyncResult = _encodedTransfer.SendRequestAsync(new KeyValuePair<EncodingRequestHeader, EncodingRequestBody>(dataToSend,
                 new EncodingRequestBody { Body = _requestStream.ToArray() }),
-                (requestSent) => 
-                {                    
+                (requestSent) =>
+                {
                     _encodedTransfer.ReceiveResponseHeaderAsync(requestSent,
                         (headers) => {
                             if (headers.HasBody)
                             {
-                                _encodedTransfer.ReceiveResponseBodyAsync(requestSent, (body) => 
+                                _encodedTransfer.ReceiveResponseBodyAsync(requestSent, (body) =>
                                 {
                                     Debug.WriteLine("Returned body: " + body.GetBody().Length);
                                 });

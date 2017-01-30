@@ -11,7 +11,9 @@ namespace Proxy.Encoding
     {
         public string Version;
         public string HttpMethod;
-        public Uri RequestUri;
+        public string RequestUri;
         public List<HttpHeader> RequestHeaders;
+
+        public Uri RequestAsUri { get { return new Uri(RequestUri); } }
     }
 }

@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 using Titanium.Web.Proxy.EventArguments;
 using Titanium.Web.Proxy.Helpers;
 using System.Configuration;
+using Proxy.Encoding;
 using Proxy.Filters;
 
 namespace Titanium.Web.Proxy
@@ -22,7 +23,7 @@ namespace Titanium.Web.Proxy
     public partial class ProxyServer
     {
         private static readonly int BUFFER_SIZE = 8192 * 4;
-        
+
         private static readonly string[] ColonSpaceSplit = { ": " };
         private static readonly char[] SpaceSplit = { ' ' };
 
@@ -75,6 +76,7 @@ namespace Titanium.Web.Proxy
 
         public static void Initialize()
         {
+            BluetoothInvokerSingleton.Instance = new BluetoothInvoker();
             RoutesFilter.Init();
             Console.WriteLine(typeof(RoutesFilter).FullName + " initialized");
 
@@ -94,13 +96,13 @@ namespace Titanium.Web.Proxy
 
             //Fix a bug in .NET 4.0
             NetFrameworkHelper.UrlPeriodFix();
-            //useUnsafeHeaderParsing 
+            //useUnsafeHeaderParsing
             NetFrameworkHelper.ToggleAllowUnsafeHeaderParsing(true);
         }
 
 
         public static bool Start()
-        {            
+        {
             _listener = new TcpListener(ListeningIpAddress, ListeningPort);
             _listener.Start();
 
@@ -153,7 +155,7 @@ namespace Titanium.Web.Proxy
                 Debug.WriteLine(error.ToString());
                 if (client != null)
                     client.Close();
-            }            
+            }
         }
 
 

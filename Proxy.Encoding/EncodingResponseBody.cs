@@ -20,7 +20,7 @@ namespace Proxy.Encoding
 
         public PlainEncodingResponseBody() : base() { }
 
-        public int Position;
+        public long Position;
         public byte[] PlainBody;
 
         public override Stream GetBody()
@@ -35,12 +35,12 @@ namespace Proxy.Encoding
     public class TwoWayEncodingResponseBody : EncodingResponseBody
     {
         private MemoryStream _bodyStream;
-        
+
         public TwoWayEncodingResponseBody() : base() { }
 
         public int Position;
         public bool WriteDone { get; set; }
-        
+
         public Stream BodyStream { get; set; }
 
         public override Stream GetBody()
@@ -50,11 +50,11 @@ namespace Proxy.Encoding
 
         public PlainEncodingResponseBody CreatePlain()
         {
-            var memStream = new MemoryStream(); 
-            
+            var memStream = new MemoryStream();
+
             WaitForWriteDone();
             BodyStream.CopyTo(memStream);
-            
+
             var rez = new PlainEncodingResponseBody
             {
                 Position = Position,

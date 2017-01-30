@@ -32,9 +32,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
-    <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -42,6 +40,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="BluetoothRequest.cs" />
     <Compile Include="EncodedProxyResponse.cs" />
     <Compile Include="EncodedRemoteTransfer.cs" />
     <Compile Include="Encoder.cs" />
@@ -51,6 +50,8 @@
     <Compile Include="EncodingRequestHeader.cs" />
     <Compile Include="EncodingResponseBody.cs" />
     <Compile Include="EncodingResponseHeader.cs" />
+    <Compile Include="EncodedBluetoothTransfer.cs" />
+    <Compile Include="IBluetoothInvoker.cs" />
     <Compile Include="IEncodedAsyncResult.cs" />
     <Compile Include="IEncodedTransfer.cs" />
     <Compile Include="MD5Helper.cs" />

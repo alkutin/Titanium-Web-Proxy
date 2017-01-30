@@ -9,6 +9,7 @@ using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using EndPointProxy;
 
 namespace Proxy.Encoding
 {
@@ -17,11 +18,11 @@ namespace Proxy.Encoding
         static ConcurrentDictionary<Guid, EncodingAsyncResult> _sessions = new ConcurrentDictionary<Guid, EncodingAsyncResult>();
         private Encoder _encoder;
 
-        public string Url { get { return ConfigurationManager.AppSettings["ApiUrl"]; } }
+        public string Url { get{ return ConfigurationSingleton.Instance.Url; } }
 
-        public byte[] Key { get { return System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Key"]); } }
-        public byte[] Vector { get { return System.Text.Encoding.ASCII.GetBytes(ConfigurationManager.AppSettings["Vector"]); } }
-        
+        public byte[] Key { get { return System.Text.Encoding.ASCII.GetBytes(ConfigurationSingleton.Instance.Key); } }
+        public byte[] Vector { get { return System.Text.Encoding.ASCII.GetBytes(ConfigurationSingleton.Instance.Vector); } }
+
         public EncodedRemoteTransfer()
         {
             _encoder = new Encoder(Key, Vector);
@@ -29,11 +30,11 @@ namespace Proxy.Encoding
 
         public void Abort(IEncodedAsyncResult requestAsyncResult)
         {
-            var request = CreateRequest("DELETE", requestAsyncResult.Key, string.Empty);            
+            var request = CreateRequest("DELETE", requestAsyncResult.Key, string.Empty);
             request.GetResponseAsync();
             EncodingAsyncResult removedItem;
             if (_sessions.TryRemove(requestAsyncResult.Key, out removedItem))
-                removedItem.Dispose();            
+                removedItem.Dispose();
         }
 
         public void ReceiveResponseBodyAsync(IEncodedAsyncResult requestAsyncResult, Action<EncodingResponseBody> onReceiveBody)
@@ -45,12 +46,12 @@ namespace Proxy.Encoding
             {
                 var file = Path.Combine(folder, eTag) + ".$$$";
                 if (File.Exists(file))
-                {                    
-                    requestAsyncResult.ResponseBody = new PlainEncodingResponseBody 
-                    { 
+                {
+                    requestAsyncResult.ResponseBody = new PlainEncodingResponseBody
+                    {
                         PlainBody = File.ReadAllBytes(file)
                     };
-                    
+
                     Task.Delay(5000).ContinueWith(t =>
                     {
                         EncodingAsyncResult removedItem;
@@ -161,9 +162,9 @@ namespace Proxy.Encoding
             var asyncResult = new EncodingAsyncResult { Key = key, RequestHeaders = request.Key };
             _sessions.TryAdd(key, asyncResult);
 
-            if (onComplete != null)            
+            if (onComplete != null)
                 Task.Run(() => { onComplete(asyncResult); });
-            
+
             return asyncResult;
         }
 
